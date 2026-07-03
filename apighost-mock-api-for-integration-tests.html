@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock any API for integration tests with your OpenAPI spec | APIGhost</title>
+<meta name="description" content="Stop hardcoding test responses. APIGhost turns your OpenAPI spec into a working mock server in seconds — with VCR recording, scenario switching, and GitHub Actions support.">
+<meta name="keywords" content="mock api server, openapi mock server, api mocking for tests, fake api server github actions, pytest mock api, jest mock server, integration test mock">
+<link rel="canonical" href="https://coding-dev-tools.github.io/apighost-mock-api-for-integration-tests.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Mock any API for integration tests with your OpenAPI spec",
+  "description": "Step-by-step guide to replacing hardcoded test responses with an OpenAPI-driven mock server using APIGhost.",
+  "author": {"@type": "Organization", "name": "Coding Dev Tools"},
+  "datePublished": "2026-07-03",
+  "keywords": "openapi mock server, api mocking, integration tests, github actions, pytest, jest"
+}
+</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #161b22 0%, #0d1117 100%); border-bottom: 1px solid #30363d; padding: 64px 24px 48px; text-align: center; }
+  .hero h1 { font-size: clamp(26px, 4vw, 42px); font-weight: 700; max-width: 720px; margin: 0 auto 16px; }
+  .hero p { color: #8b949e; font-size: 18px; max-width: 560px; margin: 0 auto 32px; }
+  .badge { display: inline-block; background: #1f2937; border: 1px solid #374151; border-radius: 20px; padding: 4px 14px; font-size: 13px; color: #818cf8; margin-bottom: 24px; }
+  .install-box { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; display: inline-block; font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 14px; color: #79c0ff; margin-top: 8px; }
+  .content { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+  h2 { font-size: 24px; font-weight: 600; margin: 48px 0 16px; color: #e6edf3; border-bottom: 1px solid #21262d; padding-bottom: 8px; }
+  h3 { font-size: 18px; font-weight: 600; margin: 28px 0 12px; color: #79c0ff; }
+  p { margin-bottom: 16px; color: #c9d1d9; }
+  pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; overflow-x: auto; margin: 16px 0 24px; }
+  code { font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 13px; color: #e6edf3; }
+  p code, li code { background: #21262d; border-radius: 4px; padding: 2px 6px; font-size: 13px; color: #79c0ff; }
+  .step { display: flex; gap: 16px; margin-bottom: 32px; }
+  .step-num { flex-shrink: 0; width: 32px; height: 32px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-top: 2px; }
+  .step-content { flex: 1; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+  th { background: #161b22; color: #8b949e; font-weight: 600; text-align: left; padding: 10px 14px; border: 1px solid #30363d; }
+  td { padding: 10px 14px; border: 1px solid #30363d; color: #c9d1d9; }
+  td:first-child { color: #e6edf3; font-weight: 500; }
+  .check { color: #3fb950; }
+  .cross { color: #f85149; }
+  .callout { background: #161b22; border-left: 4px solid #6366f1; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 24px 0; }
+  .callout p { margin: 0; }
+  .pricing { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 24px 0; }
+  .price-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 24px; }
+  .price-card h4 { font-size: 16px; margin-bottom: 8px; }
+  .price-card .amount { font-size: 28px; font-weight: 700; color: #818cf8; margin-bottom: 12px; }
+  .price-card ul { list-style: none; }
+  .price-card li { padding: 4px 0; font-size: 14px; color: #8b949e; }
+  .price-card li::before { content: "✓ "; color: #3fb950; }
+  .cta-block { background: linear-gradient(135deg, #1e1b4b 0%, #161b22 100%); border: 1px solid #6366f1; border-radius: 12px; padding: 40px; text-align: center; margin: 48px 0; }
+  .cta-block h2 { border: none; margin-top: 0; }
+  .cta-btn { display: inline-block; background: #6366f1; color: #fff; border-radius: 8px; padding: 12px 28px; font-size: 16px; font-weight: 600; text-decoration: none; margin-top: 20px; }
+  .cta-btn:hover { background: #818cf8; }
+  nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 12px 24px; }
+  nav a { color: #8b949e; text-decoration: none; font-size: 14px; margin-right: 20px; }
+  nav a:hover { color: #e6edf3; }
+  footer { border-top: 1px solid #21262d; padding: 32px 24px; text-align: center; color: #8b949e; font-size: 14px; margin-top: 48px; }
+  footer a { color: #818cf8; text-decoration: none; }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; color: #c9d1d9; }
+  li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/">← Coding Dev Tools</a>
+  <a href="/openapi-mock-server-comparison.html">Mock server comparison</a>
+  <a href="https://github.com/Coding-Dev-Tools/apighost">GitHub</a>
+</nav>
+
+<div class="hero">
+  <div class="badge">API Tooling · Tutorial</div>
+  <h1>Mock any API for integration tests with your OpenAPI spec</h1>
+  <p>Stop hardcoding test responses. APIGhost reads your spec and generates a working mock server with realistic data, scenario switching, and deterministic VCR replay — in CI or locally.</p>
+  <div class="install-box">pip install git+https://github.com/Coding-Dev-Tools/apighost.git</div>
+</div>
+
+<div class="content">
+
+  <h2>The problem with hardcoded test responses</h2>
+  <p>Every team ends up with the same problem: integration tests that call a real API, or a fake one built from JSON fixtures that drift out of sync with the actual spec.</p>
+  <p>Real API calls make tests slow, flaky, and dependent on credentials and network access in CI. JSON fixtures fall behind the spec silently — your tests keep passing while the contract changes underneath them.</p>
+  <p>There's a better approach: generate the mock server directly from your OpenAPI spec. When the spec changes, the mock updates automatically. No manual fixture maintenance, no live API calls in CI.</p>
+
+  <h2>Step-by-step: set up APIGhost for integration tests</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h3>Install APIGhost</h3>
+      <p>APIGhost is a Python CLI tool. Install it into your project's virtualenv or globally:</p>
+      <pre><code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git</code></pre>
+      <p>Verify the install:</p>
+      <pre><code>apighost --version</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h3>Point it at your OpenAPI spec</h3>
+      <p>Start a mock server from any OpenAPI 3.x spec file or URL:</p>
+      <pre><code># From a local file
+apighost serve api/openapi.yaml
+
+# From a URL
+apighost serve https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore.yaml</code></pre>
+      <p>The server starts on port 8080 by default. Every endpoint defined in the spec is immediately available, returning realistic fake data generated from your schema property names.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h3>Test error paths with scenario switching</h3>
+      <p>Edge-case testing usually means either mocking at the unit level or using a staging environment that may not support injecting errors. APIGhost's scenario system handles this without touching your test code:</p>
+      <pre><code># Start in the built-in "error" scenario
+apighost serve api/openapi.yaml --scenario error
+
+# Create a custom scenario for rate limiting
+apighost scenario create rate-limited -d "Simulate 429 responses"
+apighost scenario edit rate-limited "GET /users" --status 429 --body '{"error":"rate_limit_exceeded"}'
+
+# Run with the custom scenario
+apighost serve api/openapi.yaml --scenario rate-limited</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h3>Record once, replay forever (VCR mode)</h3>
+      <p>If you have a real API available during setup, record its responses once and replay them in every subsequent test run. Responses are identical on every replay — no flakiness from network variance or rate limits:</p>
+      <pre><code># Record a session against the real API
+apighost record api/openapi.yaml --output my-api-cassette
+
+# Replay the cassette in CI — no network access needed
+apighost replay my-api-cassette -p 8080</code></pre>
+      <p>Cassettes are stored in <code>~/.apighost/cassettes/</code> as JSON and can be committed to version control alongside your test suite.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h3>Wire it into GitHub Actions</h3>
+      <p>Start the mock server as a background service before your test step. A short sleep lets the server bind before requests arrive:</p>
+      <pre><code>name: Integration tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+
+      - name: Start mock API server
+        run: |
+          apighost serve api/openapi.yaml -p 8080 &amp;
+          sleep 2
+
+      - name: Run integration tests
+        run: pytest tests/integration/
+        env:
+          API_BASE_URL: http://localhost:8080</code></pre>
+      <p>For deterministic runs (zero network access after the first setup), use <code>apighost replay</code> instead of <code>apighost serve</code> and commit the cassette to the repo.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <h3>Point your test client at localhost:8080</h3>
+      <p>Configure your test suite's HTTP client to use the mock server URL instead of the real API. Most frameworks support this via an environment variable:</p>
+      <pre><code># pytest (Python)
+import os
+import httpx
+
+BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8080")
+
+def test_list_users():
+    resp = httpx.get(f"{BASE_URL}/users")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert isinstance(data, list)</code></pre>
+      <pre><code>// Jest (Node.js / TypeScript)
+const BASE_URL = process.env.API_BASE_URL ?? "http://localhost:8080";
+
+test("GET /users returns array", async () => {
+  const res = await fetch(`${BASE_URL}/users`);
+  expect(res.status).toBe(200);
+  const data = await res.json();
+  expect(Array.isArray(data)).toBe(true);
+});</code></pre>
+    </div>
+  </div>
+
+  <h2>APIGhost vs alternatives</h2>
+  <p>The main contenders for OpenAPI-driven mocking are Prism, WireMock, and Mockoon. Here's how they differ:</p>
+  <table>
+    <tr>
+      <th>Feature</th>
+      <th>APIGhost</th>
+      <th>Prism</th>
+      <th>WireMock</th>
+      <th>Mockoon</th>
+    </tr>
+    <tr>
+      <td>OpenAPI → mock server</td>
+      <td class="check">✓</td>
+      <td class="check">✓</td>
+      <td class="cross">✗</td>
+      <td class="check">✓</td>
+    </tr>
+    <tr>
+      <td>VCR record/replay</td>
+      <td class="check">✓</td>
+      <td class="cross">✗</td>
+      <td class="check">✓</td>
+      <td class="cross">✗</td>
+    </tr>
+    <tr>
+      <td>Scenario switching</td>
+      <td class="check">✓</td>
+      <td class="cross">✗</td>
+      <td class="check">✓</td>
+      <td class="check">✓</td>
+    </tr>
+    <tr>
+      <td>Realistic fake data</td>
+      <td class="check">✓</td>
+      <td class="check">✓</td>
+      <td class="cross">✗</td>
+      <td class="cross">✗</td>
+    </tr>
+    <tr>
+      <td>CLI-first (no GUI)</td>
+      <td class="check">✓</td>
+      <td class="check">✓</td>
+      <td class="check">✓</td>
+      <td class="cross">✗</td>
+    </tr>
+    <tr>
+      <td>Zero-config from spec</td>
+      <td class="check">✓</td>
+      <td class="check">✓</td>
+      <td class="cross">✗</td>
+      <td class="check">✓</td>
+    </tr>
+    <tr>
+      <td>Spec change auto-sync</td>
+      <td class="check">✓</td>
+      <td class="check">✓</td>
+      <td class="cross">✗</td>
+      <td class="cross">✗</td>
+    </tr>
+  </table>
+  <p><strong>vs Prism:</strong> Prism is the closest alternative — also CLI-first, also OpenAPI-driven. The key differences: Prism has no VCR recording, no named scenario system, and does not generate data from property-name hints. If you need to capture and replay real interactions, or switch between a "success" and "rate-limited" scenario without code changes, APIGhost covers that.</p>
+  <p><strong>vs WireMock:</strong> WireMock requires hand-written stub definitions. Its strength is its recording feature, but without an OpenAPI spec as the source of truth, your stubs drift. APIGhost auto-generates stubs from the spec and keeps them in sync as the spec evolves.</p>
+  <p><strong>vs Mockoon:</strong> Mockoon requires a GUI to configure routes. APIGhost is headless — suitable for CI environments with no display.</p>
+
+  <div class="callout">
+    <p><strong>Note on install:</strong> APIGhost is not yet published to public PyPI. Install via the git URL above or from the <a href="https://coding-dev-tools.github.io/pypi-index/simple/apighost/" style="color:#818cf8">self-hosted package index</a>: <code>pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost</code></p>
+  </div>
+
+  <h2>Pricing</h2>
+  <p>Local and dev use is free with no account required. The Pro tier unlocks unlimited requests and removes the session cap, which matters in CI where a single run can exceed the Free limit quickly:</p>
+  <div class="pricing">
+    <div class="price-card">
+      <h4>Free</h4>
+      <div class="amount">$0</div>
+      <ul>
+        <li>Unlimited local use</li>
+        <li>100 requests/session</li>
+        <li>OpenAPI serve + scenario</li>
+      </ul>
+    </div>
+    <div class="price-card" style="border-color:#6366f1">
+      <h4>Pro</h4>
+      <div class="amount">$12<span style="font-size:16px;color:#8b949e">/mo</span></div>
+      <ul>
+        <li>Unlimited requests</li>
+        <li>VCR cassettes</li>
+        <li>CI/CD integration</li>
+        <li>$119/yr (save 17%)</li>
+      </ul>
+    </div>
+    <div class="price-card">
+      <h4>Suite</h4>
+      <div class="amount">$49<span style="font-size:16px;color:#8b949e">/mo</span></div>
+      <ul>
+        <li>All Pro features</li>
+        <li>Full DevForge suite</li>
+        <li>10 CLI tools</li>
+        <li>$39/mo billed annually</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="cta-block">
+    <h2>Try APIGhost in your next test run</h2>
+    <p style="color:#8b949e;margin-top:12px">One command to install. One command to start a mock server from your spec. No account required for local use.</p>
+    <div class="install-box" style="display:block;text-align:left;margin:20px auto;max-width:600px">pip install git+https://github.com/Coding-Dev-Tools/apighost.git</div>
+    <a class="cta-btn" href="https://github.com/Coding-Dev-Tools/apighost">View on GitHub →</a>
+    <p style="color:#8b949e;font-size:13px;margin-top:16px">MIT license · Python 3.10+ · <a href="/openapi-mock-server-comparison.html" style="color:#818cf8">Compare with Prism, WireMock, Mockoon</a></p>
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="https://github.com/Coding-Dev-Tools">Coding Dev Tools</a> &mdash;
+  <a href="/">Tools</a> &middot;
+  <a href="https://github.com/Coding-Dev-Tools/apighost">APIGhost</a> &middot;
+  <a href="/openapi-mock-server-comparison.html">Comparison</a>
+  </p>
+</footer>
+
+</body>
+</html>
