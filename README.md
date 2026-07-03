@@ -1,35 +1,14 @@
 # Coding-Dev-Tools.github.io
 
-> One-line description of **Coding-Dev-Tools.github.io** goes here.
+Static GitHub Pages site for the [Coding Dev Tools](https://github.com/Coding-Dev-Tools) organization.
 
-## Overview
+## Live site
+- https://coding-dev-tools.github.io
 
-What this project does and why it exists. Replace this paragraph with a
-2-3 sentence description of the problem space and the approach.
+## Guidelines
+- Deployed from `main`.
+- Minimal, fast, low-dependency frontend.
+- Site content lives in `index.html`.
 
-## Install
-
-```bash
-# install
-```
-
-## Usage
-
-```bash
-# example invocation
-```
-
-## Test
-
-```bash
-# test command
-```
-
-## Contributing
-
-Issues and PRs welcome. See `AGENTS.md` if present for agent-style
-contribution guidance.
-
-## License
-
-MIT (see [LICENSE](./LICENSE)).
+## Scripts
+None. This repo is static only.
