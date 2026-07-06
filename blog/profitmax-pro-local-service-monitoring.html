@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run profitmax-pro locally for service-health suggestions | Revenue Holdings</title>
+<meta name="description" content="profitmax-pro is a local Python agent that runs service health checks and suggests fixes from an LLM. No dashboard alert, no hosted bill.">
+</head>
+<body>
+<h1>Run profitmax-pro locally for service-health suggestions</h1>
+<p>We were running multiple health-check tools. Each had its own output format and its own dashboard. None of them explained what to try when something broke.</p>
+<p>profitmax-pro is a local Python agent for that gap. It runs registered health checks and asks an LLM to suggest next actions based on the results. It does not replace the checks. It adds a fix-suggestion layer on top.</p>
+
+<h2>Install</h2>
+<pre><code>git clone https://github.com/Coding-Dev-Tools/profitmax-pro.git && cd profitmax-pro && pip install .
+profitmax --task status
+</code></pre>
+
+<h2>What it does</h2>
+<ul>
+<li>local Python agent that runs health checks and suggests fixes with an LLM</li>
+<li>7 health-check tools including OpenClaw, Paperclip, KiloClaw, and an aggregated service health check</li>
+<li>model fallback chain: DeepSeek, then Gemini Flash, then Mistral</li>
+<li>checks run in the registered order, not in parallel</li>
+<li>decorator-based registry for adding custom checks</li>
+</ul>
+
+<h2>Verification notes</h2>
+<p>README shows no public checkout/pricing claim; do not invent checkout copy.</p>
+<p>Console entry point used: <code>profitmax</code>. Commands: <code>heartbeat</code>, <code>status</code>, <code>self-improve</code>. License: MIT. Python: 3.11+. Repo: https://github.com/Coding-Dev-Tools/profitmax-pro</p>
+
+</body>
+</html>

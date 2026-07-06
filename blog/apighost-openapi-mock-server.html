@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turn any OpenAPI spec into a working mock server | Revenue Holdings</title>
+<meta name="description" content="APIGhost reads an OpenAPI 3.x spec and spins up a mock server with realistic fake data, VCR recording, and scenario switching.">
+</head>
+<body>
+<h1>Turn any OpenAPI spec into a working mock server</h1>
+<p>Every frontend and integration test needs a mock API. Hardcoding responses breaks the moment a field changes, and hand-written mocks drift as soon as the spec updates.</p>
+<p>APIGhost is the Python option for that gap. Point it at an OpenAPI 3.x spec and it starts a mock server in one command. Fake data uses property-name hints, so <code>email</code> fields get emails and <code>id</code> fields get IDs.</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+apighost serve petstore.yaml
+</code></pre>
+
+<h2>What it does</h2>
+<ul>
+<li>reads OpenAPI 3.x specs and generates endpoints automatically</li>
+<li>Faker-powered fake data with property-name hints</li>
+<li>scenario switching (for example <code>--scenario error</code>)</li>
+<li>VCR recording (<code>--record</code>) for deterministic replay in CI</li>
+<li>Python 3.10+, MIT license</li>
+</ul>
+
+<h2>Verification notes</h2>
+<p>Install is not public PyPI. Working paths: <code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git</code> or <code>pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost</code>. Free for local and dev use. Pro is $12/mo for unlimited requests, VCR cassettes, and CI integration. Suite is $49/mo for all Coding-Dev-Tools tools. License: MIT. Repo: https://github.com/Coding-Dev-Tools/apighost</p>
+
+</body>
+</html>
