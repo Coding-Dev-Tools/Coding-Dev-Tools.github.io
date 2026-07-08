@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turn any OpenAPI spec into a working mock server | Revenue Holdings</title>
+<meta name="description" content="APIGhost reads an OpenAPI 3.x spec and spins up a mock server with realistic fake data, VCR recording, and scenario switching. MIT, Python 3.10+.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "APIGhost",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "any",
+  "description": "OpenAPI spec to working mock server with VCR recording and scenario switching",
+  "offers": [
+    {"@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free for local and dev use"},
+    {"@type": "Offer", "price": "12", "priceCurrency": "USD", "description": "Pro $12/mo ($119/yr) for unlimited requests, VCR cassettes, and CI integration"},
+    {"@type": "Offer", "price": "49", "priceCurrency": "USD", "description": "Suite $49/mo for all Coding-Dev-Tools tools under one license"}
+  ],
+  "license": "https://opensource.org/licenses/MIT"
+}
+</script>
+</head>
+<body>
+<h1>Turn any OpenAPI spec into a working mock server</h1>
+<p>Every frontend and integration test needs a mock API. Hardcoding responses breaks the moment a field changes, and hand-written mocks drift as soon as the spec updates.</p>
+
+<p>APIGhost is the Python option for that gap. Point it at an OpenAPI 3.x spec and it starts a mock server in one command. Fake data uses property-name hints, so <code>email</code> fields get emails and <code>id</code> fields get IDs.</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+apighost serve petstore.yaml
+</code></pre>
+<p>APIGhost is not on public PyPI. If you use Homebrew, the tap is also available: <code>brew tap Coding-Dev-Tools/homebrew-tap && brew install apighost</code>.</p>
+
+<h2>Why this matters for CI</h2>
+<p>Most mock servers are either hand-maintained JSON or generated once and forgotten. When the spec changes, the mocks do not. APIGhost generates endpoints directly from the spec. Add a field to the schema, rerun the serve command, and the new field is there.</p>
+
+<h2>Record and replay</h2>
+<p>Deterministic tests need deterministic responses. <code>--record</code> captures real responses. <code>--replay</code> serves the same JSON every time.</p>
+<pre><code>apighost record petstore.yaml --output fixtures/cassette.json
+apighost replay fixtures/cassette.json -p 8080
+</code></pre>
+
+<h2>Edge cases without editing fixtures</h2>
+<p>APIGhost ships with named scenario presets. Add an error scenario once and flip to it with a flag:</p>
+<pre><code>apighost serve spec.yaml --scenario error
+</code></pre>
+<p>You can also create custom scenarios.</p>
+
+<h2>Pricing</h2>
+<p>Free tier covers local and dev use. Pro is <strong>$12/mo ($119/yr)</strong> for unlimited requests, VCR cassettes, and CI integration. Suite is <strong>$49/mo</strong> for all Coding-Dev-Tools tools under one license.</p>
+
+<h2>Where to go next</h2>
+<p>The <a href="/apighost-getting-started.html">Getting started guide</a> covers the full CI walkthrough — GitHub Actions, pytest examples, and scenario switching in automation.</p>
+
+<p>MIT, Python 3.10+, no telemetry, no account required.</p>
+
+<footer>
+  <p>Repo: <a href="https://github.com/Coding-Dev-Tools/apighost">github.com/Coding-Dev-Tools/apighost</a> &mdash; <a href="/apighost-getting-started.html">Getting started guide</a></p>
+</footer>
+</body>
+</html>
