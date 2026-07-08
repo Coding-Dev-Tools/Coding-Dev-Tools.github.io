@@ -128,9 +128,8 @@
 
   <section class="hero">
     <h1>CLI tools that <span class="highlight">just work</span></h1>
-    <p>11 open-source developer utilities for API contracts, SQL conversion, infrastructure diffs, config drift detection, and more. MIT licensed.</p>
+    <p>12 open-source developer utilities for API contracts, SQL conversion, infrastructure diffs, config drift detection, and more. MIT licensed.</p>
     <a class="cta" href="https://github.com/Coding-Dev-Tools">Explore on GitHub</a>
-    <a class="cta" href="https://coding-dev-tools.github.io/devforge/" style="margin-left:12px;background:transparent;border:1px solid var(--accent);color:var(--accent-light);">Visit DevForge Site →</a>
   </section>
 
   <section class="tools">
@@ -186,10 +185,86 @@
         <p>Sync, rotate, and manage .env files across environments securely.</p>
         <span class="tag">Security</span>
       </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/agent-os">
+        <h3>Agent OS</h3>
+        <p>Cross-agent continuity system: shared state, session coordination, and autonomous runtime.</p>
+        <span class="tag">Agent Runtime</span>
+      </a>
       <a class="card" href="https://github.com/Coding-Dev-Tools/vscode-schemaforge">
         <h3>VS Code SchemaForge</h3>
         <p>Live schema preview, quick convert, diff, and format detection in VS Code.</p>
         <span class="tag">Editor</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/agent-os">
+        <h3>Agent OS</h3>
+        <p>Cross-agent continuity system: shared state, session coordination, and autonomous runtime.</p>
+        <span class="tag">Agent Runtime</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="tools" style="padding-top:0">
+    <h2>Guides & Comparisons</h2>
+    <div class="grid">
+      <a class="card" href="/how-to-rotate-api-keys-in-ci.html">
+        <h3>Rotate API Keys in CI</h3>
+        <p>Step-by-step guide to rotating API keys safely in CI without leaking secrets.</p>
+        <span class="tag">APIAuth</span>
+      </a>
+      <a class="card" href="/apiauth-vs-other-secret-tools.html">
+        <h3>APIAuth vs Other Secret Tools</h3>
+        <p>Honest comparison of API key management alternatives — git-secret, sops, Vault, direnv.</p>
+        <span class="tag">APIAuth</span>
+      </a>
+      <a class="card" href="/openapi-mock-server-comparison.html">
+        <h3>OpenAPI Mock Server Comparison</h3>
+        <p>Honest side-by-side of APIGhost vs Prism, WireMock, and Mockoon for mock APIs.</p>
+        <span class="tag">APIGhost</span>
+      </a>
+      <a class="card" href="/prisma-to-drizzle-migration.html">
+        <h3>Prisma to Drizzle Migration</h3>
+        <p>How to migrate ORM schemas from Prisma to Drizzle without hand-editing SQL.</p>
+        <span class="tag">SchemaForge</span>
+      </a>
+      <a class="card" href="/sql-to-graphql-schema-generator.html">
+        <h3>SQL to GraphQL Schema Generator</h3>
+        <p>Convert SQL DDL to GraphQL SDL automatically — types, enums, and scalars in one command.</p>
+        <span class="tag">SchemaForge</span>
+      </a>
+      <a class="card" href="/how-to-stop-env-leaking-into-git.html">
+        <h3>Stop .env Files from Leaking into Git</h3>
+        <p>Four steps to prevent .env commits and clean up existing secret leaks in git history.</p>
+        <span class="tag">Envault</span>
+      </a>
+      <a class="card" href="/saas-churn-prediction-with-stripe.html">
+        <h3>SaaS Churn Prediction from Stripe</h3>
+        <p>Nightly risk scores, voluntary vs involuntary churn paths, and an intervention pipeline that tracks saves.</p>
+        <span class="tag">Retention</span>
+      </a>
+      <a class="card" href="/click-to-mcp.html">
+        <h3>Click to MCP</h3>
+        <p>Wrap any Click or Typer CLI as an MCP server for AI agents. Zero boilerplate, stdio or HTTP+SSE transport.</p>
+        <span class="tag">AI/MCP</span>
+      </a>
+      <a class="card" href="/monitor-service-health-cli.html">
+        <h3>Monitor Service Health from the Terminal</h3>
+        <p>Run structured health checks across local services with profitmax-pro — decorator-based registry and LLM suggestions.</p>
+        <span class="tag">Profitmax</span>
+      </a>
+      <a class="card" href="/track-revenue-locally-no-saas.html">
+        <h3>Track Revenue Locally</h3>
+        <p>Single HTML file + Chart.js dashboard for product and subsidiary revenue. No backend, no account.</p>
+        <span class="tag">Revenue</span>
+      </a>
+      <a class="card" href="/apighost-mock-api-for-integration-tests.html">
+        <h3>Mock Any API for Integration Tests</h3>
+        <p>APIGhost turns your OpenAPI spec into a mock server with VCR recording, scenario switching, and GitHub Actions support — no fixtures to maintain.</p>
+        <span class="tag">API tooling</span>
+      </a>
+      <a class="card" href="/apighost-getting-started.html">
+        <h3>Getting Started with APIGhost</h3>
+        <p>Install, serve a spec, record interactions for CI, and replay them deterministically. The shortest path from spec to green tests.</p>
+        <span class="tag">API tooling</span>
       </a>
     </div>
   </section>
@@ -199,3 +274,5 @@
   </footer>
 </body>
 </html>
+
+<!-- build trigger -->

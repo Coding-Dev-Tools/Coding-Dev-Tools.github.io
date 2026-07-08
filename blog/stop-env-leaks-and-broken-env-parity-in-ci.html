@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stop .env leaks and broken env parity in CI | Revenue Holdings</title>
+<meta name="description" content="Four workflows to prevent .env commits, catch missing keys before they land, and rotate secrets without touching a text editor. Uses rh-envault, an open-source CLI.">
+</head>
+<body>
+<h1>Stop .env leaks and broken env parity in CI</h1>
+
+<p>Somewhere in your git history is a <code>.env</code> file that should never have been committed. The keys in it probably should have rotated months ago.</p>
+
+<p>The usual response is more process: more review checklists, stricter access rules, more meetings. That doesn't fix the real problem, which is that someone is still copying secrets by hand.</p>
+
+<h2>Diff before you merge</h2>
+<p>This is the one that catches the actual leaks. Before code lands, compare the variables in the branch against what should be there:</p>
+<pre><code>rh-envault diff dev prod --fail-on-missing</code></pre>
+<p>If a key is missing or changed unexpectedly, the command exits non-zero and the CI gate stops the deploy. No guessing, no "I'll fix it in the next ticket."</p>
+
+<h2>Rotate as part of deploy</h2>
+<p>Don't rotate in a separate ticket queue that never gets picked up. Rotate in the branch, land it, sync to prod in the same pipeline:</p>
+<pre><code>rh-envault rotate DATABASE_PASSWORD --length 32</code></pre>
+<p>The tool infers the secret type — DB password, API key, JWT — and generates a value that fits. No text editor, no explaining to the team why it took three weeks.</p>
+
+<h2>Sync without overwriting what shouldn't move</h2>
+<p>Moving config from staging to prod should not accidentally overwrite a target-specific secret:</p>
+<pre><code>rh-envault sync staging prod</code></pre>
+<p>Secrets stay put unless you explicitly override them. The command copies only config values, not credentials that live in a separate store.</p>
+
+<h2>Audit every change</h2>
+<p>When something breaks, you need a record to check instead of relying on memory:</p>
+<pre><code>rh-envault audit</code></pre>
+<p>Every diff, sync, and rotate is logged. The output is queryable from the CLI, so you don't have to grep through git logs to find out who changed what and when.</p>
+
+<h2>Keep the plaintext surface small</h2>
+<p>The config file is Git-friendly. The secrets are not. Encrypt the .env files with a single master key and keep the encrypted file in version control. Treat the CI runner as a pass-through:</p>
+<pre><code>rh-envault export --format github-actions > $GITHUB_ENV</code></pre>
+<p>Avoid <code>echo > .env</code> inside a job — that just recreates the problem.</p>
+
+<h2>What the free tier covers</h2>
+<p>The free tier is the diff/sync/rotate loop. It works offline, has no telemetry, and requires no account. Secret store integrations (AWS SSM, HashiCorp Vault, Doppler, 1Password), bulk rotate-all, unlimited audit history, team shared configs, dashboard, and compliance reports unlock at the paid tiers.</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/envault.git
+rh-envault init my-project</code></pre>
+
+<p>MIT, Python 3.10+, no telemetry, no account.</p>
+
+<p><em>Disclosure: I maintain Envault, so take the example accordingly. The workflows above are the same ones I use in my own projects.</em></p>
+
+<p>Docs: <a href="https://github.com/Coding-Dev-Tools/envault">github.com/Coding-Dev-Tools/envault</a></p>
+</body>
+</html>

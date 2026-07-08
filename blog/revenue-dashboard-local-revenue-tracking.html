@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Track revenue locally without a SaaS subscription | Revenue Holdings</title>
+<meta name="description" content="Revenue Dashboard is a single-page HTML + Chart.js tool for tracking revenue across products and subsidiaries. Runs offline, exports to CSV.">
+</head>
+<body>
+<h1>Track revenue locally without a SaaS subscription</h1>
+<p>I wanted a simple way to see how revenue moves across products and subsidiaries. The options I found were either hosted dashboards with logins and subscriptions, or spreadsheets I maintained by hand.</p>
+
+<p>Revenue Dashboard is just an HTML file plus Chart.js. Open it in a browser or serve it locally. No build step, no server, no telemetry, no account.</p>
+
+<h2>Install</h2>
+<pre><code>open dashboard.html
+
+# or serve locally
+python -m http.server 8080
+# Visit http://localhost:8080/dashboard.html
+</code></pre>
+
+<h2>What it does</h2>
+<ul>
+<li>Revenue overview by product and subsidiary</li>
+<li>Monthly and quarterly trend charts</li>
+<li>Top performers and growth metrics</li>
+<li>Filter by date range, product, or subsidiary</li>
+<li>Export the current view to CSV</li>
+</ul>
+
+<h2>Why it works</h2>
+<p>Everything runs in the browser. There is no backend, no database, and no account required. Open the file directly or serve it with any local HTTP server.</p>
+
+<h2>Export</h2>
+<p>Use the CSV export to pull the current view into a spreadsheet or accounting tool. The filter state is preserved on export so you do not have to reformat the slice manually.</p>
+
+<p>License: not declared in README. Source: <a href="https://github.com/Coding-Dev-Tools/revenue-dashboard">github.com/Coding-Dev-Tools/revenue-dashboard</a></p>
+
+<footer>
+  <p>Repo: <a href="https://github.com/Coding-Dev-Tools/revenue-dashboard">github.com/Coding-Dev-Tools/revenue-dashboard</a></p>
+</footer>
+</body>
+</html>
