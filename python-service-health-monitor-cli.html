@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitor service health with a Python CLI — no dashboard required</title>
+<meta name="description" content="Python service-health monitor that suggests fixes. No hosted dashboard, no recurring bill.">
+<meta property="og:title" content="Monitor service health with a Python CLI — no dashboard required">
+<meta property="og:description" content="Run health checks locally and get LLM-suggested fixes from one Python repo.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://coding-dev-tools.github.io/python-service-health-monitor-cli.html">
+<style>
+  :root{ color-scheme: light dark; }
+  body{ font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.65; margin: 0; padding: 2rem; }
+  main{ max-width: 860px; margin: 0 auto; }
+  h1{ font-size: 1.75rem; line-height: 1.25; margin: 0 0 0.5rem; }
+  .lede{ font-size: 1.05rem; opacity: .85; margin: 0 0 1.25rem; }
+  code{ background: rgba(125,125,125,.18); padding: .15rem .35rem; border-radius: .35rem; font-size: .92em; }
+  pre{ overflow-x: auto; padding: .9rem; border-radius: .6rem; background: rgba(125,125,125,.12); }
+  a{ color: #3b82f6; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Monitor service health with a Python CLI — no dashboard required",
+  "description": "How to run local service health checks and LLM-suggested fixes with profitmax, without adding another SaaS dashboard.",
+  "author": { "@type": "Organization", "name": "Coding-Dev-Tools" },
+  "publisher": { "@type": "Organization", "name": "Coding-Dev-Tools" }
+}
+</script>
+</head>
+<main>
+  <h1>Monitor service health with a Python CLI — no dashboard required</h1>
+  <p class="lede">profitmax is a local Python agent that checks services and suggests fixes with an LLM. No hosted dashboard, no recurring bill.</p>
+
+  <h2>Install</h2>
+  <pre><code>git clone https://github.com/Coding-Dev-Tools/profitmax-pro.git
+cd profitmax-pro
+pip install .
+profitmax --task status</code></pre>
+
+  <h2>What it checks</h2>
+  <p>It ships with health-check tools for OpenClaw, Paperclip, KiloClaw, and an aggregated service-health view. The LLM layer uses a fallback chain: DeepSeek, then Gemini Flash, then Mistral. Checks run in the order you register them, not in parallel.</p>
+
+  <h2>Add your own checks</h2>
+  <p>The registry is decorator-based. Add a custom check with a function and a decorator instead of editing a central config file.</p>
+  <pre><code>from profitmax import registry
+
+@registry.health_check
+def payment_gateway():
+    return {"ok": True, "latency_ms": 180}</code></pre>
+
+  <h2>When it is useful</h2>
+  <ul>
+    <li>local stacks where a hosted monitor feels heavy</li>
+    <li>CI or staging runs that need a quick health snapshot</li>
+    <li>teams that already have dashboards but want a suggested-fix layer</li>
+  </ul>
+
+  <h2>Honest limits</h2>
+  <p>This is not a monitoring dashboard and not an alerting service. It runs when you run it. The LLM suggestions are only as good as the checks and the model you have configured locally.</p>
+
+  <p>MIT, Python 3.11+, no telemetry, no account required.</p>
+  <p><a href="https://github.com/Coding-Dev-Tools/profitmax-pro">View the repo →</a></p>
+</main>
+</html>
