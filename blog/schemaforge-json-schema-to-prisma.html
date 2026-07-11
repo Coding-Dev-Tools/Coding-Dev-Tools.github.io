@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convert JSON Schema to Prisma without rewriting types by hand | Revenue Holdings</title>
+<meta name="description" content="Generate a Prisma schema from a JSON Schema definition — types, enums, indexes, and constraints handled automatically.">
+</head>
+<body>
+<h1>Convert JSON Schema to Prisma without rewriting types by hand</h1>
+<p>JSON Schema is great for validation. Your database layer speaks Prisma. Bridging the two by hand means guessing type mappings, duplicating enums, and hoping you did not miss an index.</p>
+<p>SchemaForge converts JSON Schema definitions into Prisma schema files directly.</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git
+schemaforge convert --from json_schema --to prisma --input schema.json --output schema.prisma
+</code></pre>
+
+<h2>What it does</h2>
+<ul>
+<li>converts JSON Schema to Prisma schema in one command</li>
+<li>maps JSON Schema types to Prisma types automatically</li>
+<li>preserves enums, indexes, and unique constraints</li>
+<li>also converts Prisma back to JSON Schema</li>
+<li>honest about limits: foreign keys and relations are not yet preserved</li>
+<li>Python 3.10+, MIT license, 310 passing tests</li>
+</ul>
+
+<h2>Why it works</h2>
+<p>Every format converts to and from a shared internal representation. That makes roundtripping safe and means adding a new format does not require pairwise converters. You add one parser and one generator.</p>
+
+<h2>Pricing</h2>
+<p>Free tier covers the CLI with rate-limited batch conversions. Paid tiers add unlimited conversions, batch mode, and custom type mappings. Individual is $15/mo ($12 billed annually), Suite is $49/mo for all 11 Coding-Dev-Tools tools, and Team is $79/mo for up to 5 devs.</p>
+
+<h2>Verification notes</h2>
+<p>Install is not public PyPI. Working path: <code>pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git</code>. Self-hosted index alternative: <code>pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ schemaforge-cli</code>. Claims verified against <code>schemaforge/README.md</code> and <code>verified-facts-ledger.md</code>. Foreign-key limitation disclosed per README Limitations section.</p>
+
+</body>
+</html>

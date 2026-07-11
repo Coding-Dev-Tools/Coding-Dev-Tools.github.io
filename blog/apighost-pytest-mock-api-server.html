@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock a REST API in pytest without a backend | APIGhost</title>
+<meta name="description" content="Use APIGhost to spin up a local mock API server inside pytest. Deterministic fixtures, scenario switching, and zero external dependencies in CI.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Mock a REST API in pytest without a backend",
+  "description": "Use APIGhost to spin up a local mock API server inside pytest. Deterministic fixtures, scenario switching, and zero external dependencies in CI.",
+  "author": {"@type": "Organization", "name": "Coding Dev Tools"},
+  "keywords": ["pytest mock api", "python mock rest api", "apighost pytest", "mock api server python", "integration test mock server"],
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "APIGhost",
+    "applicationCategory": "DeveloperApplication",
+    "offers": [
+      {"@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free for local and dev use"},
+      {"@type": "Offer", "price": "12", "priceCurrency": "USD", "description": "Pro — $12/mo ($119/yr): unlimited requests, VCR cassettes, CI integration"},
+      {"@type": "Offer", "price": "49", "priceCurrency": "USD", "description": "Suite — $49/mo: all Coding-Dev-Tools under one license"}
+    ]
+  }
+}
+</script>
+</head>
+<body>
+<a class="back" href="/blog/index.html">← Blog</a>
+
+<h1>Mock a REST API in pytest without a backend</h1>
+
+<p>External HTTP calls are the most common source of flaky integration tests. The API is slow, rate-limited, or just unreachable in CI — and suddenly half your test suite is red for reasons unrelated to your code.</p>
+
+<p>The standard fix is <code>responses</code> or <code>httpretty</code>: hand-written stubs that you maintain forever. The moment the real API adds a field, your stubs drift silently.</p>
+
+<p><strong>APIGhost reads your OpenAPI spec and starts a real HTTP server</strong> with realistic fake data. The stubs are generated from the spec, so they update when the spec updates. No maintained JSON blobs.</p>
+
+<h2>Install</h2>
+
+<pre><code># via the self-hosted index (recommended)
+pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
+
+# or directly from source
+pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+
+# macOS Homebrew
+brew tap Coding-Dev-Tools/homebrew-tap
+brew install apighost
+</code></pre>
+
+<p>APIGhost is not on public PyPI. Use one of the commands above.</p>
+
+<h2>The simplest pytest fixture</h2>
+
+<p>Start the mock server as a session-scoped fixture so it launches once and all tests share it.</p>
+
+<pre><code>import subprocess
+import time
+import pytest
+import requests
+
+@pytest.fixture(scope="session", autouse=True)
+def mock_api(tmp_path_factory):
+    port = 18080
+    proc = subprocess.Popen(
+        ["apighost", "serve", "openapi.yaml", "--port", str(port)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    # Wait for the server to accept connections
+    for _ in range(20):
+        try:
+            requests.get(f"http://localhost:{port}/", timeout=0.5)
+            break
+        except Exception:
+            time.sleep(0.25)
+    yield f"http://localhost:{port}"
+    proc.terminate()
+
+
+def test_users_returns_list(mock_api):
+    resp = requests.get(f"{mock_api}/users")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert isinstance(data, list)
+    assert "email" in data[0]  # faker fills property-name hints automatically
+</code></pre>
+
+<p>No stubs. No patching. Real HTTP, real JSON, zero external dependencies.</p>
+
+<h2>Deterministic responses with VCR</h2>
+
+<p>Faker randomness is great for smoke tests but breaks assertions on exact values. Record once, replay forever.</p>
+
+<pre><code>@pytest.fixture(scope="session", autouse=True)
+def mock_api(tmp_path_factory):
+    cassette = "tests/fixtures/cassette.json"
+    port = 18080
+    proc = subprocess.Popen(
+        ["apighost", "replay", cassette, "--port", str(port)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    # ... same wait loop as above ...
+    yield f"http://localhost:{port}"
+    proc.terminate()
+</code></pre>
+
+<p>Generate the cassette once against a real (or faker-based) server:</p>
+
+<pre><code>apighost record openapi.yaml --output tests/fixtures/cassette.json
+</code></pre>
+
+<p>Check the cassette into source control. Tests now run identically on every machine and every CI run.</p>
+
+<h2>Testing error paths with scenarios</h2>
+
+<p>APIGhost ships named scenario presets. To test what your code does when the API returns 500s, pass a fixture parameter instead of editing JSON:</p>
+
+<pre><code>@pytest.fixture
+def mock_api_error():
+    port = 18081
+    proc = subprocess.Popen(
+        ["apighost", "serve", "openapi.yaml", "--port", str(port), "--scenario", "error"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    for _ in range(20):
+        try:
+            requests.get(f"http://localhost:{port}/", timeout=0.5)
+            break
+        except Exception:
+            time.sleep(0.25)
+    yield f"http://localhost:{port}"
+    proc.terminate()
+
+
+def test_client_handles_500_gracefully(mock_api_error):
+    resp = requests.get(f"{mock_api_error}/orders")
+    assert resp.status_code == 500
+    # Assert your retry / fallback logic kicks in
+</code></pre>
+
+<p>No fixture editing. Flip <code>--scenario error</code> on and your entire error-path test suite runs against server-level 500 responses.</p>
+
+<h2>GitHub Actions in four lines</h2>
+
+<p>APIGhost runs anywhere Python 3.10+ is available. Add it to your CI workflow alongside your test runner:</p>
+
+<pre><code>- name: Install test deps
+  run: |
+    pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
+    pip install pytest requests
+
+- name: Run tests (mock server starts inside pytest fixture)
+  run: pytest tests/
+</code></pre>
+
+<p>No extra services to spin up in GitHub Actions. The <code>mock_api</code> fixture handles the lifecycle.</p>
+
+<h2>When to use VCR vs live faker</h2>
+
+<table>
+<thead>
+<tr><th>Situation</th><th>Recommendation</th></tr>
+</thead>
+<tbody>
+<tr><td>Smoke tests / schema coverage</td><td>Live faker (<code>apighost serve</code>) — always reflects spec shape</td></tr>
+<tr><td>Assertions on specific values</td><td>VCR cassette (<code>apighost replay</code>) — deterministic</td></tr>
+<tr><td>Error path testing</td><td><code>--scenario error</code> against live faker or cassette</td></tr>
+<tr><td>CI on every PR</td><td>VCR cassette committed to repo — no network dependency</td></tr>
+</tbody>
+</table>
+
+<h2>Pricing</h2>
+
+<p>The Free tier covers local and dev use — the fixture above runs entirely free. <strong>Pro ($12/mo or $119/yr)</strong> unlocks unlimited concurrent requests, multi-cassette management, and CI-mode flags for parallelised test runs. Suite ($49/mo) bundles all Coding-Dev-Tools products under one license.</p>
+
+<h2>What about <code>responses</code>, <code>httpretty</code>, or <code>pytest-httpserver</code>?</h2>
+
+<p>Those tools are fine for unit tests where you control every response. APIGhost is the better fit when you have an OpenAPI spec and want generated coverage without maintaining stubs. When the spec changes, regenerate the cassette — no JSON hunting.</p>
+
+<footer>
+<p>Repo: <a href="https://github.com/Coding-Dev-Tools/apighost">github.com/Coding-Dev-Tools/apighost</a>
+&mdash; <a href="/blog/apighost-getting-started.html">Getting-started guide</a>
+&mdash; <a href="/blog/apighost-openapi-mock-server.html">OpenAPI mock server overview</a></p>
+</footer>
+</body>
+</html>
