@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API Key Management in FastAPI with APIAuth</title>
+<meta name="description" content="Secure API key generation, verification, and rotation for FastAPI apps using APIAuth's encrypted local keystore. No SaaS dependency, no telemetry.">
+</head>
+<body>
+<h1>API Key Management in FastAPI with APIAuth</h1>
+<p>FastAPI is the go-to framework for modern Python APIs. But managing the API keys that protect those endpoints? That's still a manual mess — keys in .env files, secrets in CI logs, no rotation, no audit trail.</p>
+<p>APIAuth is a local CLI that generates, stores, verifies, and rotates API keys in an AES-256-GCM encrypted keystore. It works offline, has no telemetry, and integrates with FastAPI through a simple dependency. Here's how to wire it up.</p>
+
+<h2>Install</h2>
+<pre><code>pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apiauth
+# or: pip install git+https://github.com/Coding-Dev-Tools/apiauth.git
+</code></pre>
+
+<h2>Generate keys for your FastAPI services</h2>
+<p>Each service gets its own named key with an expiry date:</p>
+<pre><code># Generate a key for the payments service
+apiauth generate api-key --name "Payments API" --service "payments" --expiry-days 90
+
+# Generate a JWT with custom claims for the auth service
+apiauth generate jwt --name "Auth Service JWT" --service "auth" --expiry-days 30 --claim role=admin --claim scope=write
+</code></pre>
+<p>Keys are stored in <code>~/.apiauth/keystore.enc</code> encrypted with a master key that never leaves your machine.</p>
+
+<h2>FastAPI dependency for key verification</h2>
+<p>Create a dependency that verifies incoming keys against the local keystore:</p>
+<pre><code># auth.py
+from fastapi import Depends, HTTPException, Security
+from fastapi.security import APIKeyHeader
+import subprocess
+import json
+
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+def verify_api_key(api_key: str = Security(api_key_header)):
+    if not api_key:
+        raise HTTPException(status_code=401, detail="Missing API key")
+    
+    # Verify against the local keystore
+    result = subprocess.run(
+        ["apiauth", "verify", api_key, "--json-output"],
+        capture_output=True, text=True
+    )
+    
+    if result.returncode != 0:
+        raise HTTPException(status_code=401, detail="Invalid or expired API key")
+    
+    key_data = json.loads(result.stdout)
+    return key_data
+
+# Usage in your routes
+@app.get("/api/payments")
+async def get_payments(key_data: dict = Depends(verify_api_key)):
+    return {"service": key_data.get("service"), "data": "..."}
+</code></pre>
+
+<h2>Middleware for automatic verification</h2>
+<p>For global protection, add middleware that verifies every request:</p>
+<pre><code># middleware.py
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response, JSONResponse
+import subprocess
+
+class APIAuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Skip health checks and docs
+        if request.url.path in ["/health", "/docs", "/openapi.json", "/redoc"]:
+            return await call_next(request)
+        
+        api_key = request.headers.get("X-API-Key")
+        if not api_key:
+            return JSONResponse({"detail": "Missing API key"}, status_code=401)
+        
+        result = subprocess.run(
+            ["apiauth", "verify", api_key, "--json-output"],
+            capture_output=True, text=True
+        )
+        
+        if result.returncode != 0:
+            return JSONResponse({"detail": "Invalid or expired API key"}, status_code=401)
+        
+        # Attach key info to request state for downstream use
+        import json
+        request.state.api_key_data = json.loads(result.stdout)
+        
+        return await call_next(request)
+
+app.add_middleware(APIAuthMiddleware)
+</code></pre>
+
+<h2>Rotate keys in CI/CD without downtime</h2>
+<p>Rotate the key, export the new value for the runner, and the old key is hashed out:</p>
+<pre><code># In your deployment pipeline
+# 1. Rotate the key for the service being deployed
+apiauth rotate <payments-key-id>
+
+# 2. Export the fresh key value for GitHub Actions
+apiauth export --format github-actions --service payments >> $GITHUB_ENV
+
+# 3. Audit before release — fails if any key is expired
+apiauth audit --exit-on-expired
+</code></pre>
+<p><code>apiauth audit --exit-on-expired</code> exits non-zero if anything is stale, so the deploy stops before a bad key ships.</p>
+
+<h2>Free vs Individual tier</h2>
+<p>The Free tier covers generate, verify, and env-format export for up to 5 keys — enough for a solo project. The Individual tier ($12/mo, $10/yr) unlocks unlimited keys, all export formats (dotenv, JSON, GitHub Actions), JWT custom claims, and audit/stats commands. A Suite license covering all 11 Revenue Holdings tools is $49/mo ($39/yr).</p>
+
+<h2>Verification notes</h2>
+<p>Claims sourced from <code>apiauth/README.md</code> and cross-checked against <code>Obsidian-Vault-Local/40-Marketing/verified-facts-ledger.md</code> (last verified 2026-07-07). Install is not public PyPI. Working paths: <code>pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apiauth</code> or <code>pip install git+https://github.com/Coding-Dev-Tools/apiauth.git</code>. Pricing table: Free $0 (5 keys), Individual $12/mo ($10/yr), Suite $49/mo ($39/yr), Team $79/mo ($63/yr), Enterprise custom. License: MIT. Python 3.10+.</p>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "API Key Management in FastAPI with APIAuth",
+  "description": "Secure API key generation, verification, and rotation for FastAPI apps using APIAuth's encrypted local keystore.",
+  "author": {"@type": "Organization", "name": "Coding-Dev-Tools"},
+  "publisher": {"@type": "Organization", "name": "Coding-Dev-Tools"},
+  "datePublished": "2026-07-12",
+  "dateModified": "2026-07-12"
+}
+</script>
+</body>
+</html>
