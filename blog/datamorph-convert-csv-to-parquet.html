@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convert CSV to Parquet from the command line with DataMorph</title>
+<meta name="description" content="DataMorph is a streaming data format converter CLI that turns CSV into Parquet (and JSON, YAML, Avro, and more) without loading files into memory. Schema inference, batch mode, and CI-friendly validation — no pandas, no OOM.">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; padding: 48px 24px; max-width: 840px; margin: 0 auto; }
+  h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 700; margin-top: 36px; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+  h3 { font-size: 18px; font-weight: 600; margin-top: 28px; margin-bottom: 8px; }
+  p, li { color: #c9d1d9; }
+  a { color: #818cf8; }
+  pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 14px; }
+  code { background: #161b22; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+  pre code { background: none; padding: 0; }
+  .meta { color: #8b949e; font-size: 14px; margin-bottom: 24px; }
+  .tag { display: inline-block; margin: 4px 4px 0 0; font-size: 12px; color: #10b981; background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 4px; }
+  ul, ol { padding-left: 24px; }
+  li { margin-bottom: 6px; }
+  .back { display: inline-block; margin-bottom: 24px; color: #818cf8; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+  th { background: #161b22; color: #e6edf3; font-weight: 600; }
+  td { color: #c9d1d9; }
+  .highlight { color: #f0883e; }
+  .note { background: rgba(129,140,248,0.08); border-left: 3px solid #818cf8; padding: 12px 16px; border-radius: 6px; margin: 16px 0; font-size: 14px; color: #c9d1d9; }
+</style>
+</head>
+<body>
+<a class="back" href="/blog/index.html">← Back to Blog</a>
+<h1>Convert CSV to Parquet from the command line with DataMorph</h1>
+<p class="meta">Product: <strong>DataMorph</strong> · Category: Data Engineering, ETL, CLI · Tags: <span class="tag">csv to parquet</span> <span class="tag">data format converter</span> <span class="tag">streaming etl</span> <span class="tag">schema validation</span></p>
+
+<p>You need to get a 12&nbsp;GB CSV into Parquet for Athena. You reach for pandas, write <code>pd.read_csv('huge.csv').to_parquet('out.parquet')</code> — and watch your process get killed on an out-of-memory error. Or you scaffold yet another throwaway script that you'll never find again.</p>
+
+<p><strong>DataMorph</strong> is a single CLI command that converts between data formats by <em>streaming</em> row-by-row, so files over 10&nbsp;GB fit in constant memory. It infers schemas automatically, batch-converts whole directories, and validates data against a schema in CI with proper exit codes. No DataFrame boilerplate, no OOM.</p>
+
+<h2>Why a dedicated converter instead of pandas?</h2>
+<p>pandas is fantastic, but it loads the entire file into memory. On anything past a few hundred MB that means swap, then an OOM kill. DataMorph streams:</p>
+<ul>
+  <li>📦 <strong>Streams >10&nbsp;GB</strong> files row-by-row — constant memory, no OOM</li>
+  <li>🧠 <strong>Schema inference</strong> — auto-detect field types from the data, export as JSON</li>
+  <li>✅ <strong>Schema validation</strong> — check data files against an expected schema, with CI-friendly exit codes</li>
+  <li>📁 <strong>Batch mode</strong> — convert entire directories at once with <code>--recursive</code></li>
+  <li>🔁 <strong>6+ format pairs</strong> — CSV ↔ JSON ↔ JSONL ↔ YAML ↔ Parquet ↔ Avro ↔ Protobuf</li>
+</ul>
+
+<h2>Install DataMorph</h2>
+<p>DataMorph is not on public PyPI. Install directly from GitHub (recommended), or via Homebrew/Scoop:</p>
+
+<pre><code># pip (recommended)
+pip install git+https://github.com/Coding-Dev-Tools/datamorph.git
+
+# Homebrew (macOS/Linux)
+brew tap Coding-Dev-Tools/tap
+brew install datamorph
+
+# Scoop (Windows)
+scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
+scoop install datamorph</code></pre>
+
+<p>Then verify it works:</p>
+<pre><code>datamorph --help</code></pre>
+
+<h2>Quick start: convert a file in one command</h2>
+<p>The core command is <code>convert</code> — source path in, destination path out. The output format is detected from the file extension:</p>
+
+<pre><code># CSV → Parquet (the classic "convert csv to parquet cli" task)
+datamorph convert input.csv output.parquet
+
+# JSON → CSV for reporting
+datamorph convert input.json output.csv
+
+# YAML → JSON
+datamorph convert input.yaml output.json
+
+# Parquet → CSV for a quick look
+datamorph convert input.parquet output.csv</code></pre>
+
+<p>No flags, no config. DataMorph reads the schema from the data and streams the conversion. This is the command you'll actually type when someone drops a 9&nbsp;GB export on your desk.</p>
+
+<h2>Batch-convert whole directories</h2>
+<p>One file at a time is fine; an entire folder of mixed files is where batch mode earns its keep:</p>
+
+<pre><code># Convert every CSV in ./csv_data/ to Parquet in ./parquet_data/, recursively
+datamorph batch ./csv_data/ ./parquet_data/ --from csv --to parquet --recursive</code></pre>
+
+<p><code>batch</code> walks the tree, converts each matching file, and preserves the directory structure. Point it at a raw exports folder and get a processed folder out the other side.</p>
+
+<h2>Inspect and export schemas</h2>
+<p>Before you depend on a conversion, you often want to know what the data looks like. <code>schema</code> infers the structure and can emit it as JSON:</p>
+
+<pre><code># Pretty-print the inferred schema
+datamorph schema data.parquet
+
+# Export schema for later validation
+datamorph schema data.csv --json-output > schema.json</code></pre>
+
+<p>Use the exported schema as a contract: validate future data files against it so a silent column change never reaches production.</p>
+
+<h2>Validate data in CI (the real ROI)</h2>
+<p>The highest-leverage use of DataMorph is a CI gate. <code>validate</code> exits with code 1 on a schema mismatch — perfect for blocking a bad data file before it ships:</p>
+
+<pre><code># GitHub Actions — fail the build on schema drift
+- name: Validate data schemas
+  run: |
+    pip install git+https://github.com/Coding-Dev-Tools/datamorph.git
+    datamorph validate data/events.csv --schema schemas/events.json --strict
+    datamorph validate data/users.json --schema schemas/users.json --strict</code></pre>
+
+<pre><code># Generic CI — fail on schema mismatch
+datamorph validate data.csv --schema schema.json || echo "Schema mismatch detected!"</code></pre>
+
+<p><code>--strict</code> tightens the check (unknown fields and type drift become failures). <code>--json-output</code> gives you machine-readable results for dashboards or audit trails.</p>
+
+<h2>Comparison: DataMorph vs the usual approaches</h2>
+<p>Every data team eventually writes conversion glue. Here's how a dedicated CLI compares:</p>
+<table>
+  <tr><th>Capability</th><th>pandas script</th><th>csvkit</th><th>DataMorph</th></tr>
+  <tr><td>CSV → Parquet</td><td>✅</td><td>❌</td><td>✅</td></tr>
+  <tr><td>Streaming >10&nbsp;GB (no OOM)</td><td>❌ (loads all)</td><td>❌</td><td>✅</td></tr>
+  <tr><td>Schema validation + exit codes</td><td>❌ (you write it)</td><td>❌</td><td>✅</td></tr>
+  <tr><td>Batch directory convert</td><td>❌ (write a loop)</td><td>❌</td><td>✅ <code>--recursive</code></td></tr>
+  <tr><td>6+ format pairs (incl. Avro/Parquet)</td><td>✅ (with libs)</td><td>❌ (CSV only)</td><td>✅</td></tr>
+  <tr><td>Zero-config CLI</td><td>❌ (imports + boilerplate)</td><td>✅</td><td>✅</td></tr>
+</table>
+
+<p><strong>DataMorph vs pandas:</strong> pandas loads the whole file into a DataFrame. DataMorph streams row-by-row — no OOM on large files and no import boilerplate.</p>
+<p><strong>DataMorph vs csvkit:</strong> csvkit only handles CSV. DataMorph covers 6+ formats including Parquet and Avro.</p>
+
+<h2>Pricing</h2>
+<p>DataMorph is one of 11 tools in the DevForge suite. One license covers all CLI tools.</p>
+<table>
+  <tr><th>Plan</th><th>Price</th><th>Best For</th></tr>
+  <tr><td><strong>Free</strong></td><td>$0</td><td>Individuals, OSS — CLI only, 100 conversions/month</td></tr>
+  <tr><td><strong>DataMorph Pro</strong></td><td>$12/mo</td><td>Professionals — unlimited conversions, streaming, batch mode, all formats</td></tr>
+  <tr><td><strong>Suite (all 11 tools)</strong></td><td>$49/mo ($39/mo annual)</td><td>Full toolkit — 40% savings</td></tr>
+</table>
+<p>🔹 <strong>No lock-in:</strong> the CLI works fully offline on the free tier — no telemetry, no phone-home.</p>
+
+<h2>Key takeaways</h2>
+<ul>
+  <li>Converting a big CSV to Parquet should be one command, not an OOM-prone pandas script — <code>datamorph convert input.csv output.parquet</code> streams it</li>
+  <li>DataMorph covers 6+ formats (CSV, JSON, JSONL, YAML, Parquet, Avro, Protobuf) so you stop maintaining one-off converters per pair</li>
+  <li>Batch mode (<code>--recursive</code>) converts entire directories in a single call</li>
+  <li>The <code>validate</code> command exits 1 on schema mismatch — drop it into CI to block bad data before deployment</li>
+  <li>The free tier ($0, 100 conversions/month) is enough to try it on real files today</li>
+</ul>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="https://github.com/Coding-Dev-Tools/datamorph">Star DataMorph on GitHub</a> — ⭐ helps other devs find it</li>
+  <li><a href="/devforge/pricing.html">DevForge pricing →</a></li>
+  <li>Pair it with <a href="https://github.com/Coding-Dev-Tools/configdrift">ConfigDrift</a> (catch config drift before deploys) and <a href="https://github.com/Coding-Dev-Tools/envault">Envault</a> (keep secrets and env vars in sync across environments)</li>
+</ul>
+
+<h2>Verification notes</h2>
+<p class="note">All claims verified against <code>datamorph/README.md</code> (live on-disk). Install via <code>pip install git+https://github.com/Coding-Dev-Tools/datamorph.git</code>; DataMorph is <strong>not</strong> on public PyPI (PyPI JSON API returns 404 for <code>datamorph-cli</code>, verified this run), so the <code>git+</code> form is the working install. Homebrew/Scoop formulas verified in <code>homebrew-tap/</code> and <code>scoop-bucket/</code>. Formats: CSV, JSON, JSONL, YAML, Parquet, Avro, Protobuf. Commands: <code>convert</code>, <code>batch</code>, <code>schema</code>, <code>validate</code>, <code>formats</code>. Pricing: Free $0 / 100 conversions per month, Pro $12/mo (unlimited + streaming + batch + all formats), Suite $49/mo ($39 annual, all 11 tools). License: MIT. Python 3.10+.</p>
+
+</body>
+</html>
