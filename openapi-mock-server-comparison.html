@@ -142,7 +142,7 @@
 
     <h2>APIGhost</h2>
     <p>APIGhost is a Python CLI that turns an OpenAPI 3.0/3.1 spec into a running mock server in one command, populates it with Faker-powered fake data keyed off property names, and adds two things most spec-driven mocks don't bundle: VCR-style record/replay cassettes for deterministic test runs, and named scenario presets for exercising edge cases like error responses.</p>
-    <pre><code>pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
+    <pre><code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 # or, install straight from source:
 # pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 apighost serve petstore.yaml          # mock from a spec
