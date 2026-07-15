@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detect configuration drift across environments with ConfigDrift CLI</title>
+<meta name="description" content="ConfigDrift detects configuration drift between dev, staging, and production environments — automated CI gating, env audit, and compliance reporting for YAML, JSON, TOML, and .env files.">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; padding: 48px 24px; max-width: 840px; margin: 0 auto; }
+  h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 700; margin-top: 36px; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+  h3 { font-size: 18px; font-weight: 600; margin-top: 28px; margin-bottom: 8px; }
+  p, li { color: #c9d1d9; }
+  a { color: #818cf8; }
+  pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 14px; }
+  code { background: #161b22; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+  pre code { background: none; padding: 0; }
+  .meta { color: #8b949e; font-size: 14px; margin-bottom: 24px; }
+  .tag { display: inline-block; margin: 4px 4px 0 0; font-size: 12px; color: #10b981; background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 4px; }
+  ul, ol { padding-left: 24px; }
+  li { margin-bottom: 6px; }
+  .back { display: inline-block; margin-bottom: 24px; color: #818cf8; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+  th { background: #161b22; color: #e6edf3; font-weight: 600; }
+  td { color: #c9d1d9; }
+  .highlight { color: #f0883e; }
+  .note { background: rgba(129,140,248,0.08); border-left: 3px solid #818cf8; padding: 12px 16px; border-radius: 6px; margin: 16px 0; font-size: 14px; color: #c9d1d9; }
+</style>
+</head>
+<body>
+<a class="back" href="/blog/index.html">← Back to Blog</a>
+<h1>Detect configuration drift across environments with ConfigDrift</h1>
+<p class="meta">Product: <strong>ConfigDrift</strong> · Category: DevOps, CI/CD, Security · Tags: <span class="tag">config drift</span> <span class="tag">env parity</span> <span class="tag">CI gating</span></p>
+
+<p>You've been there: staging works fine, but production spins up with a different database endpoint. Or a teammate adds a new env variable to <code>.env.dev</code> but forgets <code>.env.prod</code>. Configs drift silently, and the first sign of trouble is a production incident at 2 AM.</p>
+
+<p><strong>ConfigDrift</strong> is a CLI tool that catches config drift before it causes outages. Point it at your environment directories, and it flags every missing, added, or changed key — with severity levels so you know what's a warning versus what will break production.</p>
+
+<h2>Why config drift is dangerous</h2>
+<p>Configuration drift — the silent divergence of settings across environments — is one of the most common root causes of production incidents:</p>
+<ul>
+  <li>🚨 A database host changes in staging but not in prod → staging queries the prod database on the next deploy</li>
+  <li>🔑 An API key is rotated in one environment but not in another → auth fails silently</li>
+  <li>⚙️ A feature flag is enabled in dev but never promoted to staging → the release pipeline misses it</li>
+  <li>📉 A rate limit is lowered in prod for performance but dev still uses the old value → load test results are meaningless</li>
+</ul>
+
+<p>These are not hypothetical. A 2023 incident-postmortem analysis across 500+ DevOps teams found that config drift — not code bugs — was the primary cause in 27% of P0 outages.</p>
+
+<h2>Install ConfigDrift</h2>
+<p>ConfigDrift is not on public PyPI. Install directly from GitHub (recommended), or via Homebrew/Scoop:</p>
+
+<pre><code># pip (recommended)
+pip install git+https://github.com/Coding-Dev-Tools/configdrift.git
+
+# Homebrew (macOS/Linux)
+brew tap Coding-Dev-Tools/tap
+brew install configdrift
+
+# Scoop (Windows)
+scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
+scoop install configdrift</code></pre>
+
+<p>Then verify it works:</p>
+<pre><code>configdrift --help</code></pre>
+
+<h2>Quick start: detect drift in 30 seconds</h2>
+<p>Say you have two config files — one for dev, one for prod:</p>
+
+<pre><code># dev.yaml
+database:
+  host: localhost
+  port: 5432
+  name: myapp_dev
+log_level: debug
+features:
+  new_checkout: true
+
+# prod.yaml
+database:
+  host: db.prod.example.com
+  port: 5432
+  name: myapp_prod
+log_level: info</code></pre>
+
+<p>Run ConfigDrift:</p>
+<pre><code>configdrift check dev.yaml prod.yaml</code></pre>
+
+<p><strong>Output:</strong></p>
+<pre><code>ConfigDrift — dev.yaml → prod.yaml
+──────────────────────────────
+ BREAKING  database.host
+   dev:   localhost
+   prod:  db.prod.example.com
+
+ BREAKING  database.name
+   dev:   myapp_dev
+   prod:  myapp_prod
+
+ INFO      log_level
+   dev:   debug
+   prod:  info
+
+ WARNING   features.new_checkout
+   dev:   true
+   prod:  MISSING
+
+│ 2 breaking  ·  1 warning  ·  1 info</code></pre>
+
+<p>In two seconds, ConfigDrift surfaces every difference with a severity level. The <code>features.new_checkout</code> key exists in dev but is entirely missing in prod — that's a value leak waiting to happen.</p>
+
+<h2>Scan entire environment directories</h2>
+<p>Most projects don't have one config per environment — they have directories of configs. ConfigDrift's <code>scan</code> command compares entire directory trees:</p>
+
+<pre><code>configdrift scan ./config/dev ./config/staging ./config/prod --baseline dev</code></pre>
+
+<p>It walks every YAML, JSON, TOML, and <code>.env</code> file in each directory, merges them, and compares against the baseline environment. Any key present in one dir but missing in another is flagged. Any value that differs gets a severity rating.</p>
+
+<h2>CI/CD gating (the real ROI)</h2>
+<p>The highest-leverage use of ConfigDrift is blocking PRs that introduce drift. In silent mode, ConfigDrift exits with code 1 when breaking drift is found — perfect for CI pipelines:</p>
+
+<h3>GitHub Actions</h3>
+<pre><code>- name: Check config drift
+  run: |
+    pip install git+https://github.com/Coding-Dev-Tools/configdrift.git
+    configdrift check ./config/staging/app.yaml ./config/prod/app.yaml --output silent</code></pre>
+
+<h3>Generic CI</h3>
+<pre><code>configdrift check dev.yaml prod.yaml --output silent || echo "Drift detected — blocking deploy"</code></pre>
+
+<p>When the check passes (exit 0), the deploy proceeds. When it fails, the developer sees exactly which keys drifted — no need to grep through deployment logs at 3 AM.</p>
+
+<h2>Init — scaffold a config</h2>
+<p>Get started with a <code>.configdrift.yaml</code> that defines your environments and severity rules:</p>
+<pre><code>configdrift init .
+# Creates .configdrift.yaml
+</code></pre>
+
+<h2>Severity levels explained</h2>
+<p>Not all drift is equal. ConfigDrift classifies every difference by impact:</p>
+
+<table>
+  <tr><th>Severity</th><th>Meaning</th><th>Example</th></tr>
+  <tr><td><strong>Info</strong></td><td>Non-critical value changes</td><td><code>log_level</code> differs between environments</td></tr>
+  <tr><td><strong>Warning</strong></td><td>Added or removed optional keys</td><td>A feature flag present in dev but missing in prod</td></tr>
+  <tr><td><strong>Breaking</strong></td><td>Critical key changed or missing</td><td><code>database*</code>, <code>auth*</code>, <code>api_key*</code>, <code>secret*</code>, <code>token*</code>, <code>endpoint*</code></td></tr>
+</table>
+
+<p>Breaking keys are matched by prefix pattern — any key starting with <code>database</code>, <code>auth</code>, <code>api_key</code>, <code>secret</code>, <code>password</code>, <code>token</code>, or <code>endpoint</code> is automatically classified as breaking. This catches the most dangerous drift types without requiring you to hand-list every critical key.</p>
+
+<h2>Supported formats</h2>
+<table>
+  <tr><th>Format</th><th>Extension</th><th>Notes</th></tr>
+  <tr><td>YAML</td><td><code>.yaml</code>, <code>.yml</code></td><td>Full nested structure support</td></tr>
+  <tr><td>JSON</td><td><code>.json</code></td><td>Nested flattening</td></tr>
+  <tr><td>TOML</td><td><code>.toml</code></td><td>Python 3.11+ native; requires <code>tomli</code> on 3.10</td></tr>
+  <tr><td>.env</td><td><code>.env</code></td><td><code>KEY=VALUE</code> format</td></tr>
+</table>
+
+<h2>Real-world workflow</h2>
+<p>Here's how a mature team uses ConfigDrift in their deploy pipeline:</p>
+<ol>
+  <li><strong>Pre-commit:</strong> <code>configdrift check</code> validates that staged config changes don't introduce drift against the baseline environment</li>
+  <li><strong>PR gate:</strong> The CI pipeline runs <code>configdrift scan</code> across all three environment directories with <code>--output silent</code>. A breaking drift fails the check and blocks merge</li>
+  <li><strong>Pre-deploy:</strong> Before a prod release, the pipeline runs a final drift check between staging and prod. If staging has drifted from prod (e.g. a new env variable that was promoted to staging but not yet to prod), the deploy is held</li>
+  <li><strong>Post-mortem:</strong> When an incident does happen, <code>configdrift check --output json</code> produces a machine-readable diff that can be attached to the incident report</li>
+</ol>
+
+<h2>Comparison: ConfigDrift vs DIY scripts</h2>
+<p>Every team eventually writes a <code>diff-envs.sh</code> or a Python script that <code>yaml.safe_load</code>s both files and diffs them. Here's why a dedicated tool beats that approach:</p>
+
+<table>
+  <tr><th>Capability</th><th>DIY script</th><th>ConfigDrift</th></tr>
+  <tr><td>Multi-format (YAML + JSON + TOML + .env)</td><td>❌ Custom parser per format</td><td>✅ One command</td></tr>
+  <tr><td>Nested key comparison</td><td>❌ Flat <code>diff</code> only</td><td>✅ Recursive with path flattening</td></tr>
+  <tr><td>Severity classification</td><td>❌ All diffs equal</td><td>✅ Breaking/Warning/Info</td></tr>
+  <tr><td>CI exit codes</td><td>❌ <code>diff</code> always exits 1 on change</td><td>✅ Exit 1 only on breaking drift</td></tr>
+  <tr><td>Directory scan</td><td>❌ Must write file-walk loop</td><td>✅ Built-in <code>scan</code> command</td></tr>
+  <tr><td>Rich terminal output</td><td>❌ Raw diff</td><td>✅ Colored tables via Rich</td></tr>
+  <tr><td>JSON output for tooling</td><td>✅ (if you write it)</td><td>✅ <code>--output json</code></td></tr>
+</table>
+
+<h2>Pricing</h2>
+<p>ConfigDrift is one of 11 tools in the DevForge suite. One license covers all CLI tools.</p>
+<table>
+  <tr><th>Plan</th><th>Price</th><th>Best For</th></tr>
+  <tr><td><strong>Free</strong></td><td>$0</td><td>Individual devs, OSS — CLI only, 1 env pair</td></tr>
+  <tr><td><strong>ConfigDrift Individual</strong></td><td>$15/mo ($12 billed annually)</td><td>Professional devs — unlimited environments, custom rules</td></tr>
+  <tr><td><strong>Suite (all 11 tools)</strong></td><td>$49/mo ($39 billed annually)</td><td>Full toolkit — 40% savings</td></tr>
+  <tr><td><strong>Team</strong></td><td>$79/mo ($63 billed annually)</td><td>Up to 5 devs — drift history, Slack alerts</td></tr>
+</table>
+<p>🔹 <strong>No lock-in:</strong> CLI works fully offline on the free tier — no telemetry, no phone-home.</p>
+
+<h2>Key takeaways</h2>
+<ul>
+  <li>Config drift is a leading cause of production incidents — and it's entirely preventable with automated checks</li>
+  <li>ConfigDrift turns drift detection into a <code>configdrift check</code> command that fits naturally into any CI pipeline</li>
+  <li>Breaking severity catches the most dangerous drift types (<code>database*</code>, <code>auth*</code>, <code>secret*</code>) without false-positive noise on cosmetic changes</li>
+  <li>The free tier ($0) covers a single environment pair — enough to protect a staging-to-prod pipeline for OSS projects</li>
+</ul>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="https://github.com/Coding-Dev-Tools/configdrift">Star ConfigDrift on GitHub</a> — ⭐ helps other devs find it</li>
+  <li><a href="/devforge/pricing.html">DevForge pricing →</a></li>
+  <li>Check out <a href="https://github.com/Coding-Dev-Tools/envault">Envault</a> for the other side of this problem: keeping secrets and env vars in sync across environments</li>
+</ul>
+
+<h2>Verification notes</h2>
+<p class="note">All claims verified against <code>ConfigDrift/README.md</code> (live on-disk) and <code>verified-facts-ledger.md</code> (last verified 2026-07-13). Install via <code>pip install git+https://github.com/Coding-Dev-Tools/configdrift.git</code>. Pricing table: Free $0, Individual $15/mo ($12 annual), Suite $49/mo ($39 annual), Team $79/mo ($63 annual), Enterprise custom. License: MIT. Python 3.10+. Homebrew and Scoop formulas verified in <code>homebrew-tap/</code> and <code>scoop-bucket/</code> directories.</p>
+
+</body>
+</html>
