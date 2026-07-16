@@ -14,13 +14,14 @@
 <p>You point it at a Click or typer app. The MCP client sees the same commands, but as structured tools it can call directly.</p>
 
 <h2>Install</h2>
-<pre><code>pip install click-to-mcp
+<pre><code># Install from source (not on public PyPI yet)
+pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git
 
 # HTTP+SSE transport for web-based MCP clients
-pip install "click-to-mcp[http]"
+pip install "click-to-mcp[http] @ git+https://github.com/Coding-Dev-Tools/click-to-mcp.git"
 </code></pre>
 
-<p>Public PyPI. Python 3.10+. Apache 2.0. No account, no telemetry, no rate limits.</p>
+<p>Install is from the project's GitHub source (the package is not yet published to public PyPI). Python 3.10+. Apache 2.0. No account, no telemetry, no rate limits.</p>
 
 <h2>What it does</h2>
 

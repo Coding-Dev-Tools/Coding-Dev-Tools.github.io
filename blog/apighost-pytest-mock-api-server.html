@@ -40,7 +40,7 @@
 <h2>Install</h2>
 
 <pre><code># via the self-hosted index (recommended)
-pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
+pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 
 # or directly from source
 pip install git+https://github.com/Coding-Dev-Tools/apighost.git
@@ -151,7 +151,7 @@ def test_client_handles_500_gracefully(mock_api_error):
 
 <pre><code>- name: Install test deps
   run: |
-    pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
+    pip install git+https://github.com/Coding-Dev-Tools/apighost.git
     pip install pytest requests
 
 - name: Run tests (mock server starts inside pytest fixture)

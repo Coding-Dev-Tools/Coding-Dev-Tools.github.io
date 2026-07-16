@@ -12,7 +12,7 @@
 <p>APIAuth is a local CLI that generates, stores, verifies, and rotates API keys in an AES-256-GCM encrypted keystore. It works offline, has no telemetry, and integrates with FastAPI through a simple dependency. Here's how to wire it up.</p>
 
 <h2>Install</h2>
-<pre><code>pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apiauth
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/apiauth.git
 # or: pip install git+https://github.com/Coding-Dev-Tools/apiauth.git
 </code></pre>
 
@@ -111,7 +111,7 @@ apiauth audit --exit-on-expired
 <p>The Free tier covers generate, verify, and env-format export for up to 5 keys — enough for a solo project. The Individual tier ($12/mo, $10/yr) unlocks unlimited keys, all export formats (dotenv, JSON, GitHub Actions), JWT custom claims, and audit/stats commands. A Suite license covering all 11 Revenue Holdings tools is $49/mo ($39/yr).</p>
 
 <h2>Verification notes</h2>
-<p>Claims sourced from <code>apiauth/README.md</code> and cross-checked against <code>Obsidian-Vault-Local/40-Marketing/verified-facts-ledger.md</code> (last verified 2026-07-07). Install is not public PyPI. Working paths: <code>pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apiauth</code> or <code>pip install git+https://github.com/Coding-Dev-Tools/apiauth.git</code>. Pricing table: Free $0 (5 keys), Individual $12/mo ($10/yr), Suite $49/mo ($39/yr), Team $79/mo ($63/yr), Enterprise custom. License: MIT. Python 3.10+.</p>
+<p>Claims sourced from <code>apiauth/README.md</code> and cross-checked against <code>Obsidian-Vault-Local/40-Marketing/verified-facts-ledger.md</code> (last verified 2026-07-07). Install is not public PyPI. Working paths: <code>pip install git+https://github.com/Coding-Dev-Tools/apiauth.git</code> or <code>pip install git+https://github.com/Coding-Dev-Tools/apiauth.git</code>. Pricing table: Free $0 (5 keys), Individual $12/mo ($10/yr), Suite $49/mo ($39/yr), Team $79/mo ($63/yr), Enterprise custom. License: MIT. Python 3.10+.</p>
 
 <script type="application/ld+json">
 {
