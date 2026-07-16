@@ -1,8 +1,10 @@
 name: Deploy to GitHub Pages
 
+# Manual fallback only. Automatic production deploys are handled by
+# deploy-pages.yml, which mirrors main to gh-pages (the repository's Pages
+# source). Keeping this workflow off push avoids two independent deploy
+# systems reporting success while racing to publish different artifacts.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

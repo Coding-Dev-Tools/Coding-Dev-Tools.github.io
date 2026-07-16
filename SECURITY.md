@@ -9,7 +9,7 @@ are not patched.
 
 **Please do not file public issues for security problems.**
 
-Email security reports to: **security@revenueholdings.dev** (replace with
+Email security reports to: **security@codingdev.tools** (replace with
 the project-specific address if different).
 
 Include:
