@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevForge Suite — 10 developer CLI tools in one install</title>
+  <meta name="description" content="Install ten open-source developer CLIs — API contracts, SQL conversion, infra diffs, config drift, mocking, key management, env sync, schema conversion, MCP wrapping, and dead-code detection — with a single `devforge` command. MIT licensed.">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/devforge-tools/">
+  <meta property="og:title" content="DevForge Suite — 10 developer CLI tools in one install">
+  <meta property="og:description" content="One install, one consistent CLI, ten production-ready developer tools. MIT licensed.">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      --bg: #0d1117; --surface: #161b22; --border: #30363d;
+      --text: #e6edf3; --muted: #8b949e;
+      --accent: #6366f1; --accent-light: #818cf8; --green: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    a { color: var(--accent-light); }
+    header { border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+    .logo { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: white; }
+    .brand { font-size: 20px; font-weight: 700; text-decoration: none; color: var(--text); }
+    .brand span { color: var(--accent-light); }
+    main { max-width: 960px; margin: 0 auto; padding: 56px 24px 80px; }
+    h1 { font-size: 36px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    h1 .highlight { color: var(--accent-light); }
+    .lede { font-size: 19px; color: var(--muted); margin-bottom: 12px; }
+    .updated { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    h2 { font-size: 24px; font-weight: 700; margin: 44px 0 14px; }
+    p { margin-bottom: 16px; }
+    ul { margin: 0 0 16px 22px; }
+    li { margin-bottom: 6px; }
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 16px 20px; margin: 8px 0 20px; }
+    .install-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: 8px; padding: 16px 20px; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 14px; margin: 4px 0 20px; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 8px; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--surface); font-weight: 600; }
+    code { font-family: inherit; font-size: 0.9em; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+    .cta { margin-top: 48px; background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: 8px; padding: 28px 32px; text-align: center; }
+    .cta h2 { margin: 0 0 10px; font-size: 22px; }
+    .cta p { color: var(--muted); margin-bottom: 18px; }
+    .btn { display: inline-block; background: var(--accent); color: white; font-weight: 700; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 15px; }
+    .btn:hover { background: var(--accent-light); color: white; }
+    footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 13px; color: var(--muted); }
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">D</div>
+  <a class="brand" href="/">Dev<span>Forge</span></a>
+</header>
+<main>
+  <h1>The <span class="highlight">DevForge</span> Suite — 10 CLI tools, one install</h1>
+  <p class="lede">Instead of installing ten separate tools and learning ten different CLIs, the <code>devforge</code> meta-package gives you a single, consistent command for ten production-ready developer utilities. One install, one interface, shared configuration.</p>
+  <p class="updated">Last updated: 2026-07-17 · <a href="https://github.com/Coding-Dev-Tools/devforge-cli">devforge-cli on GitHub</a></p>
+
+  <div class="callout">
+    <strong>Install note (honest):</strong> <code>devforge-tools</code> is <strong>not published on public PyPI</strong>. Install it directly from GitHub source with the <code>git+</code> form below — the only verified-working pip path right now.
+  </div>
+
+  <h2>Install</h2>
+  <div class="install-box">pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]"</div>
+  <p>Then run any tool through the unified <code>devforge</code> command — for example <code>devforge ghost serve openapi.yaml</code> or <code>devforge guard check v1.yaml v2.yaml</code>.</p>
+
+  <h2>Why one suite?</h2>
+  <ul>
+    <li><strong>Single CLI</strong> (<code>devforge</code>) to invoke any tool — no context switching.</li>
+    <li><strong>Consistent flags, output formats, and help</strong> across every tool.</li>
+    <li><strong>Shared configuration</strong> — one install gives you all tools.</li>
+    <li><strong>MIT licensed</strong> and Python 3.10+.</li>
+  </ul>
+
+  <h2>The 10 tools</h2>
+  <table>
+    <thead>
+      <tr><th>Command</th><th>Package</th><th>What it does</th><th>Learn more</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>guard</code></td><td>api-contract-guardian</td><td>Detect breaking API changes, generate migration guides, gate CI pipelines on contract violations</td><td><a href="/blog/api-contract-guardian-breaking-changes-ci.html">Guide</a></td></tr>
+      <tr><td><code>sql</code></td><td>json2sql</td><td>Convert JSON datasets to SQL with smart type inference across PostgreSQL, MySQL, and SQLite</td><td><a href="/blog/json2sql-nested-json-to-relational-sql.html">Guide</a></td></tr>
+      <tr><td><code>deploy</code></td><td>deploydiff</td><td>Preview infra changes with cost estimates and automatic rollback commands for Terraform, CloudFormation, and Pulumi</td><td><a href="/blog/deploydiff-preview-infra-changes.html">Guide</a></td></tr>
+      <tr><td><code>drift</code></td><td>configdrift</td><td>Compare configs across environments, flag missing keys, deprecated values, and compliance violations</td><td><a href="https://github.com/Coding-Dev-Tools/configdrift">Repo</a></td></tr>
+      <tr><td><code>ghost</code></td><td>apighost</td><td>Mock API server from OpenAPI specs with VCR cassette recording and realistic fake data</td><td><a href="/apighost-getting-started.html">Guide</a></td></tr>
+      <tr><td><code>auth</code></td><td>apiauth</td><td>API key and JWT lifecycle management with AES-256-GCM encrypted local store</td><td><a href="/how-to-rotate-api-keys-in-ci.html">Guide</a></td></tr>
+      <tr><td><code>envault</code></td><td>envault</td><td>Env variable syncing, diffing, and secret rotation with Vault/AWS SSM/Doppler/1Password support</td><td><a href="/how-to-stop-env-leaking-into-git.html">Guide</a></td></tr>
+      <tr><td><code>schema</code></td><td>schemaforge</td><td>Bidirectional ORM schema converter — 11 formats with zero-loss roundtripping</td><td><a href="/prisma-to-drizzle-migration.html">Guide</a></td></tr>
+      <tr><td><code>mcp</code></td><td>click-to-mcp</td><td>Auto-wrap any Click or Typer CLI as an MCP server — zero code changes</td><td><a href="/click-to-mcp.html">Guide</a></td></tr>
+      <tr><td><code>deadcode</code></td><td>deadcode</td><td>Detect unused exports, dead routes, orphaned CSS in TypeScript/React/Next.js projects</td><td><a href="/blog/deadcode-find-unused-exports-typescript.html">Guide</a></td></tr>
+    </tbody>
+  </table>
+
+  <h2>FAQ</h2>
+  <h3>Is DevForge on public PyPI?</h3>
+  <p>No. The <code>devforge-tools</code> meta-package is not on public PyPI yet. Use the <code>git+</code> install command shown above — it is the only verified-working pip path right now. Each tool can also be installed on its own from its own repo with the same <code>git+</code> form.</p>
+  <h3>Can I install just one tool instead of all ten?</h3>
+  <p>Yes. Install the meta-package with a specific extras group (e.g. <code>git+https://github.com/Coding-Dev-Tools/devforge-cli.git[ghost]</code>), or install an individual tool's repo directly (e.g. <code>git+https://github.com/Coding-Dev-Tools/apighost.git</code>).</p>
+  <h3>What Python version do I need?</h3>
+  <p>Python 3.10 or newer.</p>
+  <h3>What is the license?</h3>
+  <p>MIT — free for personal and commercial use.</p>
+
+  <div class="cta">
+    <h2>Install the full suite in one command</h2>
+    <p>Get all ten developer CLIs through a single, consistent <code>devforge</code> command.</p>
+    <a class="btn" href="https://github.com/Coding-Dev-Tools/devforge-cli">View devforge-cli on GitHub</a>
+  </div>
+</main>
+<footer>
+  <p>Part of the <a href="https://github.com/Coding-Dev-Tools">Coding Dev Tools</a> suite · <a href="/">Home</a> · <a href="/devforge-tools/blog.html">Suite blog</a> · <a href="https://revenueholdings.dev">Revenue Holdings</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevForge Suite — Guides &amp; tutorials</title>
+  <meta name="description" content="Step-by-step guides for the DevForge developer CLI suite: catch breaking API changes in CI, convert JSON to SQL, preview infra changes, rotate API keys, stop .env leaks, and more.">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/devforge-tools/blog.html">
+  <meta property="og:title" content="DevForge Suite — Guides &amp; tutorials">
+  <meta property="og:description" content="Practical guides for the ten-tool DevForge developer CLI suite.">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      --bg: #0d1117; --surface: #161b22; --border: #30363d;
+      --text: #e6edf3; --muted: #8b949e;
+      --accent: #6366f1; --accent-light: #818cf8; --green: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    a { color: var(--accent-light); }
+    header { border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+    .logo { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: white; }
+    .brand { font-size: 20px; font-weight: 700; text-decoration: none; color: var(--text); }
+    .brand span { color: var(--accent-light); }
+    main { max-width: 860px; margin: 0 auto; padding: 56px 24px 80px; }
+    h1 { font-size: 36px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    h1 .highlight { color: var(--accent-light); }
+    .lede { font-size: 19px; color: var(--muted); margin-bottom: 28px; }
+    h2 { font-size: 24px; font-weight: 700; margin: 40px 0 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 0.2s; text-decoration: none; color: var(--text); display: block; }
+    .card:hover { border-color: var(--accent); }
+    .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .card p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+    .card .tag { display: inline-block; margin-top: 10px; font-size: 12px; color: var(--green); background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 4px; }
+    .cta { margin-top: 48px; background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: 8px; padding: 28px 32px; text-align: center; }
+    .cta h2 { margin: 0 0 10px; font-size: 22px; }
+    .cta p { color: var(--muted); margin-bottom: 18px; }
+    .btn { display: inline-block; background: var(--accent); color: white; font-weight: 700; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 15px; }
+    .btn:hover { background: var(--accent-light); color: white; }
+    footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 13px; color: var(--muted); }
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">D</div>
+  <a class="brand" href="/">Dev<span>Forge</span></a>
+</header>
+<main>
+  <h1>DevForge Suite <span class="highlight">guides</span></h1>
+  <p class="lede">Practical, copy-pasteable guides for the ten-tool DevForge developer CLI suite. Every command below is verified against the tool's own README.</p>
+
+  <h2>Guides by tool</h2>
+  <div class="grid">
+    <a class="card" href="/blog/api-contract-guardian-breaking-changes-ci.html">
+      <h3>API Contract Guardian — catch breaking API changes in CI</h3>
+      <p>Gate your PRs on an OpenAPI contract diff so breaking changes never reach production.</p>
+      <span class="tag">guard</span>
+    </a>
+    <a class="card" href="/blog/json2sql-nested-json-to-relational-sql.html">
+      <h3>json2sql — nested JSON to relational SQL</h3>
+      <p>Flatten nested JSON objects and arrays into SQL INSERT statements with smart type inference.</p>
+      <span class="tag">sql</span>
+    </a>
+    <a class="card" href="/blog/deploydiff-preview-infra-changes.html">
+      <h3>DeployDiff — preview infrastructure changes</h3>
+      <p>See cost and config impact of a Terraform/CloudFormation/Pulumi change before you deploy.</p>
+      <span class="tag">deploy</span>
+    </a>
+    <a class="card" href="/apighost-getting-started.html">
+      <h3>APIGhost — mock API server from OpenAPI</h3>
+      <p>Spawn a mock server from an OpenAPI spec for local dev and integration tests.</p>
+      <span class="tag">ghost</span>
+    </a>
+    <a class="card" href="/how-to-rotate-api-keys-in-ci.html">
+      <h3>APIAuth — rotate API keys in CI</h3>
+      <p>Generate, rotate, and verify API keys and JWTs with an encrypted local store.</p>
+      <span class="tag">auth</span>
+    </a>
+    <a class="card" href="/how-to-stop-env-leaking-into-git.html">
+      <h3>Envault — stop .env leaking into git</h3>
+      <p>Sync, diff, and rotate environment variables; catch leaked secrets before they hit history.</p>
+      <span class="tag">envault</span>
+    </a>
+    <a class="card" href="/prisma-to-drizzle-migration.html">
+      <h3>SchemaForge — Prisma to Drizzle migration</h3>
+      <p>Convert between 11 ORM schema formats with zero-loss roundtripping.</p>
+      <span class="tag">schema</span>
+    </a>
+    <a class="card" href="/click-to-mcp.html">
+      <h3>click-to-mcp — wrap any CLI as an MCP server</h3>
+      <p>Expose a Click or Typer CLI to AI agents as an MCP server with zero code changes.</p>
+      <span class="tag">mcp</span>
+    </a>
+    <a class="card" href="/blog/deadcode-find-unused-exports-typescript.html">
+      <h3>DeadCode — find unused exports in TypeScript</h3>
+      <p>Detect dead exports, routes, and orphaned CSS in React/Next.js projects.</p>
+      <span class="tag">deadcode</span>
+    </a>
+  </div>
+
+  <div class="cta">
+    <h2>Ready to install the suite?</h2>
+    <p>One command gets you all ten developer CLIs through a single <code>devforge</code> command.</p>
+    <a class="btn" href="https://github.com/Coding-Dev-Tools/devforge-cli">View devforge-cli on GitHub</a>
+  </div>
+</main>
+<footer>
+  <p>Part of the <a href="https://github.com/Coding-Dev-Tools">Coding Dev Tools</a> suite · <a href="/devforge-tools/">Suite home</a> · <a href="/">Home</a> · <a href="https://revenueholdings.dev">Revenue Holdings</a></p>
+</footer>
+</body>
+</html>
