@@ -4,24 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Migrate TypeORM entities to Prisma schema automatically | SchemaForge</title>
-<meta name="description" content="Convert TypeORM entity classes to a Prisma schema file with one command. SchemaForge handles columns, types, indexes, and enums — no hand-editing required.">
+<meta name="description" content="Convert TypeORM entity classes to a Prisma schema file with SchemaForge, then review relationship details before applying the result.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "headline": "Migrate TypeORM entities to Prisma schema automatically",
-  "description": "Convert TypeORM entity classes to a Prisma schema file with one command. SchemaForge handles columns, types, indexes, and enums — no hand-editing required.",
+  "description": "Convert TypeORM entity classes to a Prisma schema file with SchemaForge, then review relationship details before applying the result.",
   "author": {"@type": "Organization", "name": "Coding Dev Tools"},
   "keywords": ["typeorm to prisma migration", "convert typeorm entities to prisma", "typeorm prisma migration tool", "schemaforge typeorm", "typeorm migration guide"],
   "about": {
     "@type": "SoftwareApplication",
     "name": "SchemaForge",
-    "applicationCategory": "DeveloperApplication",
-    "offers": [
-      {"@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free — CLI, rate-limited batch"},
-      {"@type": "Offer", "price": "15", "priceCurrency": "USD", "description": "Individual — $15/mo ($12/mo billed annually)"},
-      {"@type": "Offer", "price": "49", "priceCurrency": "USD", "description": "Suite — $49/mo: all Coding-Dev-Tools under one license"}
-    ]
+    "applicationCategory": "DeveloperApplication"
   }
 }
 </script>
@@ -58,32 +53,21 @@ th{background:#f4f4f8;font-weight:600}
 
 <h1>Migrate TypeORM entities to Prisma schema automatically</h1>
 
-<p>Prisma has become the preferred ORM for modern TypeScript backends. TypeORM still works — but the decorator-heavy syntax, unpredictable eager-loading, and loose typing have pushed most new projects toward Prisma's type-safe client and schema-first workflow.</p>
+<p>Moving between TypeORM and Prisma means translating model definitions into a different schema language and workflow.</p>
 
 <p>The migration itself is the problem. A medium-size service with 20–40 TypeORM entity classes means hundreds of fields, custom column types, composite indexes, and enum definitions to translate by hand. One missed <code>@Column({ unique: true })</code> and you drop a constraint in production.</p>
 
-<p><strong>SchemaForge converts TypeORM entity files to a Prisma schema automatically.</strong> One command reads your TypeScript entity classes and writes a Prisma-ready <code>schema.prisma</code> — columns, types, indexes, enums, and defaults included.</p>
+<p><strong>SchemaForge converts TypeORM entity files to a Prisma schema as a reviewable starting point.</strong> Its shared representation preserves tables, columns, types, defaults, indexes, unique constraints, and enums; relationship details still need review before you apply generated output.</p>
 
 <h2>Install SchemaForge</h2>
 
-<pre><code># From source (recommended — PyPI publishing pending)
-pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git
-
-# Via the self-hosted package index
-pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git
-
-# macOS / Linux via Homebrew
-brew tap Coding-Dev-Tools/homebrew-tap
-brew install schemaforge</code></pre>
+<pre><code># Install from source (PyPI publishing pending)
+pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git</code></pre>
 
 <div class="callout warn">
-<strong>Not on public PyPI.</strong> A bare <code>pip install schemaforge</code> will fail or install an unrelated package. Use one of the three forms above. Requires Python 3.10+.
+<strong>Not on public PyPI.</strong> A bare <code>pip install schemaforge</code> will fail or install an unrelated package. Use the source-install command above. Requires Python 3.10+.
 </div>
 
-<p>Verify the install:</p>
-
-<pre><code>schemaforge --version
-# schemaforge 1.7.0</code></pre>
 
 <h2>A typical TypeORM entity</h2>
 
@@ -178,7 +162,7 @@ model User {
 
 <h2>Batch convert the whole codebase</h2>
 
-<p>If your entities are spread across subdirectories, pass a root path with <code>--dir</code> or nest calls per service:</p>
+<p>If your entities are spread across subdirectories, run a conversion for each service:</p>
 
 <pre><code># Convert each service's entities separately
 for service in users orders billing; do
@@ -203,15 +187,15 @@ done</code></pre>
 <tr><td>Create/Update timestamps</td><td>✓ as <code>@default(now())</code> / <code>@updatedAt</code></td></tr>
 <tr><td>Relations (<code>@ManyToOne</code>, <code>@OneToMany</code>, etc.)</td><td>⚠ Dropped — see note below</td></tr>
 <tr><td>Foreign keys / <code>@JoinColumn</code></td><td>⚠ Dropped — see note below</td></tr>
-<tr><td>Embedded entities</td><td>⚠ Not yet supported</td></tr>
+<tr><td>Embedded entities</td><td>⚠ Review after conversion</td></tr>
 </tbody>
 </table>
 
 <div class="callout warn">
-<strong>Relations are not yet roundtripped.</strong> Foreign key constraints and ORM relation fields (<code>@ManyToOne</code>, <code>@OneToMany</code>, <code>@ManyToMany</code>) are dropped in conversion. SchemaForge converts tables, columns, types, constraints, indexes, and enums faithfully — but you'll need to add relation fields to the generated Prisma schema by hand. This is called out clearly in the SchemaForge README and is on the roadmap.
+<strong>Relations need review.</strong> Foreign-key constraints and ORM relation fields (<code>@ManyToOne</code>, <code>@OneToMany</code>, <code>@ManyToMany</code>) are dropped during conversion. SchemaForge's shared representation preserves tables, columns, types, defaults, indexes, unique constraints, and enums; review and add the relationship details before applying generated output.
 </div>
 
-<p>For most codebases this is the right trade-off: the mechanical column work is automated; the relational semantics — which are often wrong in TypeORM anyway — get a clean-slate review.</p>
+<p>The mechanical structural work is automated; relational semantics receive a deliberate review before the generated schema is applied.</p>
 
 <h2>Verify with diff</h2>
 
@@ -242,43 +226,17 @@ citext: String</code></pre>
 
 <h2>MCP server for AI-assisted migrations</h2>
 
-<p>If you use Claude Code, Cursor, or another MCP-compatible editor, SchemaForge can run as an MCP server so your AI assistant can call it directly:</p>
+<p>If you use Claude Code, Cursor, or another MCP-compatible editor, SchemaForge can run as an MCP server so an assistant can call its conversion, diff, and check tools directly:</p>
 
 <pre><code>pip install "git+https://github.com/Coding-Dev-Tools/schemaforge.git[mcp]"
-schemaforge-mcp</code></pre>
+schemaforge mcp</code></pre>
 
-<p>The MCP server exposes <code>convert</code>, <code>diff</code>, and <code>check</code> as tools. Ask the agent to "convert my TypeORM entities to Prisma" and it calls SchemaForge directly, reads the output, and adds the missing relation fields automatically.</p>
+<p>The MCP server exposes <code>convert</code>, <code>diff</code>, and <code>check</code> as tools. Generated output remains a starting point: review the missing relationship details before applying it.</p>
 
-<h2>Pricing</h2>
-
-<p>The CLI is MIT-licensed and free for individual use. Batch mode (directory conversion) is rate-limited on the free tier; remove the limit with a paid plan.</p>
-
-<div class="pricing-grid">
-  <div class="plan">
-    <h4>Free</h4>
-    <div class="price">$0 <span>forever</span></div>
-    <p>CLI, rate-limited batch, community support</p>
-  </div>
-  <div class="plan">
-    <h4>Individual</h4>
-    <div class="price">$15 <span>/mo</span></div>
-    <p>$12/mo billed annually. Unlimited batch, VS Code extension, priority support</p>
-  </div>
-  <div class="plan">
-    <h4>Suite</h4>
-    <div class="price">$49 <span>/mo</span></div>
-    <p>$39/mo billed annually. All Coding-Dev-Tools under one license</p>
-  </div>
-  <div class="plan">
-    <h4>Team</h4>
-    <div class="price">$79 <span>/mo</span></div>
-    <p>$63/mo billed annually. Per-seat Team license for shared keystore and audit</p>
-  </div>
-</div>
 
 <h2>Summary</h2>
 
-<p>SchemaForge eliminates the mechanical column-copying work of a TypeORM → Prisma migration. Run one command, get a valid <code>schema.prisma</code> with all column types, nullability, defaults, unique constraints, indexes, and enums in place. Then spend your time on the parts that need judgment: relation fields, query rewrites, and transaction patterns. 310 tests and MIT licensed.</p>
+<p>SchemaForge reduces the mechanical column-copying work of a TypeORM → Prisma migration. It supports 11 schema formats and 100 conversion directions; Alembic is generator-only. Use generated output as a starting point, then spend review time on relationship fields, query rewrites, and transaction patterns.</p>
 
 <a class="cta" href="https://github.com/Coding-Dev-Tools/schemaforge">Get SchemaForge on GitHub →</a>
 
