@@ -16,12 +16,7 @@
   "about": {
     "@type": "SoftwareApplication",
     "name": "SchemaForge",
-    "applicationCategory": "DeveloperApplication",
-    "offers": [
-      {"@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free — CLI, rate-limited batch"},
-      {"@type": "Offer", "price": "15", "priceCurrency": "USD", "description": "Individual — $15/mo ($12/mo billed annually)"},
-      {"@type": "Offer", "price": "49", "priceCurrency": "USD", "description": "Suite — $49/mo: all Coding-Dev-Tools under one license"}
-    ]
+    "applicationCategory": "DeveloperApplication"
   }
 }
 </script>
@@ -65,17 +60,10 @@ th{background:#f4f4f8;font-weight:600}
 <h2>Install SchemaForge</h2>
 
 <pre><code># From source (recommended — PyPI publishing pending)
-pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git
-
-# Via the self-hosted package index
-pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git
-
-# macOS / Linux via Homebrew
-brew tap Coding-Dev-Tools/homebrew-tap
-brew install schemaforge</code></pre>
+pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git</code></pre>
 
 <div class="callout warn">
-<strong>Not on public PyPI.</strong> A bare <code>pip install schemaforge</code> will fail or resolve an unrelated package. Use one of the three forms above. Requires Python 3.10+.
+<strong>Not on public PyPI.</strong> Use the source-install command above. Requires Python 3.10+.
 </div>
 
 <h2>A typical Django model file</h2>
@@ -205,7 +193,7 @@ model Post {
 
 <pre><code>schemaforge convert --from django --to prisma --input myapp/models/ --output schema.prisma</code></pre>
 
-<p>SchemaForge merges all model definitions into a single output file. The Free tier handles single-file conversion; the Individual tier removes the batch rate limit for large projects.</p>
+<p>For multiple input files, use the documented conversion and review process for each generated schema. Foreign-key constraints and ORM relationship fields require manual review after conversion.</p>
 
 <h2>Custom type mappings</h2>
 
@@ -231,40 +219,9 @@ django_to_prisma:
 
 <p>The <a href="https://marketplace.visualstudio.com/items?itemName=revenue-holdings.vscode-schemaforge">SchemaForge VS Code extension</a> adds a live preview panel alongside your Django model files: open a <code>models.py</code>, trigger the command palette, and see the Prisma output update as you type. No need to re-run the CLI after every edit during a migration session.</p>
 
-<h2>Pricing</h2>
 
-<p>The Free tier handles single-file conversion without a license key. The Individual tier removes the batch rate limit and is required for directory-mode conversion on large projects.</p>
 
-<div class="pricing-grid">
-  <div class="plan">
-    <h4>Free</h4>
-    <div class="price">$0 <span>/ mo</span></div>
-    <p>CLI, single-file conversion, rate-limited batch</p>
-    <a class="cta" href="https://github.com/Coding-Dev-Tools/schemaforge">Get started</a>
-  </div>
-  <div class="plan">
-    <h4>Individual</h4>
-    <div class="price">$15 <span>/ mo</span></div>
-    <p>Unlimited batch, all 11 formats, priority support. $12/mo billed annually.</p>
-    <a class="cta" href="https://revenueholdings.dev">Buy Individual</a>
-  </div>
-  <div class="plan">
-    <h4>Suite</h4>
-    <div class="price">$49 <span>/ mo</span></div>
-    <p>All Coding-Dev-Tools products under one license. $39/mo billed annually.</p>
-    <a class="cta" href="https://revenueholdings.dev">Buy Suite</a>
-  </div>
-  <div class="plan">
-    <h4>Team</h4>
-    <div class="price">$79 <span>/ mo</span></div>
-    <p>Multi-seat license for teams. $63/mo billed annually.</p>
-    <a class="cta" href="https://revenueholdings.dev">Buy Team</a>
-  </div>
-</div>
-
-<h2>Other formats SchemaForge supports</h2>
-
-<p>SchemaForge converts between all 11 supported formats in any direction: SQL DDL, Prisma, Drizzle, TypeORM, Django, SQLAlchemy, Alembic, JSON Schema, GraphQL SDL, EF Core C#, and Scala case classes. Prisma doesn't have to be the destination — you can go Django → Drizzle, Django → GraphQL SDL, or Django → SQL DDL with the same CLI:</p>
+<p>SchemaForge supports 11 formats and 100 documented conversion directions: SQL DDL, Prisma, Drizzle, TypeORM, Django, SQLAlchemy, Alembic, JSON Schema, GraphQL SDL, EF Core C#, and Scala case classes. Alembic is output-only. Prisma does not have to be the destination — you can go Django → Drizzle, Django → GraphQL SDL, or Django → SQL DDL with the same CLI:</p>
 
 <pre><code>schemaforge convert --from django --to drizzle --input models.py
 schemaforge convert --from django --to graphql --input models.py --output schema.graphql
@@ -280,6 +237,6 @@ schemaforge convert --from django --to sql --input models.py --output schema.sql
 <p><a class="cta" href="https://github.com/Coding-Dev-Tools/schemaforge">Install SchemaForge →</a></p>
 
 <hr>
-<p style="font-size:.85rem;color:#666">SchemaForge is an MIT-licensed CLI tool built by <a href="https://coding-dev-tools.github.io">Coding Dev Tools</a>. The conversion preserves field types, max_length constraints, choices-based enums, indexes, and server defaults. Foreign-key relations require a manual <code>@relation</code> step after conversion. Version v1.7.0 · 310 passing tests.</p>
+<p style="font-size:.85rem;color:#666">SchemaForge is an MIT-licensed CLI tool built by <a href="https://coding-dev-tools.github.io">Coding Dev Tools</a>. The shared representation preserves tables, columns, types, defaults, indexes, unique constraints, and enums. Foreign-key constraints and ORM relationship fields require review after conversion.</p>
 </body>
 </html>

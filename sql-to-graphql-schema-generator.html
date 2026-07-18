@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SQL to GraphQL Schema Generator – SchemaForge CLI</title>
-  <meta name="description" content="Convert SQL DDL to GraphQL SDL in one command with SchemaForge. Auto-generates type definitions, enums, and scalars from your existing database schema. Free tier available, MIT, Python 3.10+." />
+  <meta name="description" content="Convert SQL DDL to GraphQL SDL with SchemaForge. Generate type definitions, enums, and scalars from an existing schema; review relationship details after conversion." />
   <meta name="keywords" content="sql to graphql, generate graphql schema from sql, sql ddl to graphql sdl, graphql schema generator, database to graphql, schemaforge" />
   <link rel="canonical" href="https://coding-dev-tools.github.io/sql-to-graphql-schema-generator.html" />
 
@@ -79,7 +79,7 @@
         "name": "Can I convert GraphQL SDL back to SQL?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes — SchemaForge supports bidirectional conversion across all 11 formats. graphql → sql is supported the same way as sql → graphql. All format pairs roundtrip through a shared internal representation with zero data loss."
+          "text": "SchemaForge supports 11 formats and 100 documented conversion directions. GraphQL SDL can be converted to SQL, but review foreign-key constraints and ORM relationship fields after conversion because the shared representation does not retain them. Alembic is output-only."
         }
       },
       {
@@ -87,7 +87,7 @@
         "name": "Is SchemaForge free?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "The free tier covers basic convert and diff for individual use. GraphQL SDL import/export (including the sql → graphql direction), batch mode, and Alembic migration generation require Individual ($15/mo) or higher. MIT license, no telemetry, works offline."
+          "text": "SchemaForge is MIT licensed and installed from source while PyPI publishing is pending. The README does not publish tier pricing; see the repository for current project information."
         }
       }
     ]
@@ -232,10 +232,9 @@
   <p>Convert SQL DDL to GraphQL SDL in one command. Stop writing type definitions by hand — SchemaForge reads your database schema and generates them automatically.</p>
   <div class="badge-row">
     <span class="badge">11 formats</span>
-    <span class="badge">310 tests</span>
+    <span class="badge">100 documented directions</span>
     <span class="badge">MIT license</span>
     <span class="badge">Python 3.10+</span>
-    <span class="badge">No telemetry</span>
   </div>
 </header>
 
@@ -246,7 +245,7 @@
     You have a SQL schema with 20 tables. Your backend team wants a GraphQL API. Someone sits down and writes the SDL by hand — copying column names, converting <code>VARCHAR(255)</code> to <code>String</code>, <code>BOOLEAN</code> to <code>Boolean</code>, <code>UUID</code> to <code>ID</code>. Then the database schema changes and the SDL is already out of date.
   </p>
   <p>
-    SchemaForge converts SQL DDL to GraphQL SDL automatically. Each table becomes a type. Column types map to the correct GraphQL scalars. ENUMs become GraphQL enums. Nullable columns become optional fields. The conversion runs in under a second and produces output you can use directly or adjust as needed.
+    SchemaForge converts SQL DDL to GraphQL SDL automatically. Each table becomes a type. Column types map to GraphQL scalars. ENUMs become GraphQL enums. Nullable columns become optional fields. Review the generated output before use, especially relationship details: the shared representation does not retain foreign-key constraints or ORM relationship fields.
   </p>
 
   <h2>Quick start</h2>
@@ -308,7 +307,7 @@ type Post {
   </table>
 
   <div class="callout">
-    <strong>Note:</strong> Relationship directives (e.g. <code>@relationship</code> in Neo4j GraphQL or <code>@link</code> in Apollo Federation) are not generated automatically — SchemaForge converts table structures and column types. You add relationship semantics afterward based on your GraphQL server's conventions.
+    <strong>Review relationship details:</strong> SchemaForge's shared representation does not retain foreign-key constraints or ORM relationship fields. Add GraphQL relationship semantics afterward based on your GraphQL server's conventions.
   </div>
 
   <h2>More conversion examples</h2>
@@ -358,7 +357,6 @@ schemaforge diff schema-v1.sql schema-v2.sql
         <th>GraphQL → SQL</th>
         <th>Bidirectional (11 formats)</th>
         <th>Local / offline</th>
-        <th>Free tier</th>
       </tr>
     </thead>
     <tbody>
@@ -368,7 +366,6 @@ schemaforge diff schema-v1.sql schema-v2.sql
         <td class="check">✓</td>
         <td class="check">✓</td>
         <td class="check">✓</td>
-        <td class="check">✓ (CLI)</td>
       </tr>
       <tr>
         <td>Hasura (hosted)</td>
@@ -376,7 +373,6 @@ schemaforge diff schema-v1.sql schema-v2.sql
         <td class="cross">—</td>
         <td class="cross">—</td>
         <td class="cross">Hosted SaaS</td>
-        <td class="cross">Free plan limited</td>
       </tr>
       <tr>
         <td>graphql-code-generator</td>
@@ -384,7 +380,6 @@ schemaforge diff schema-v1.sql schema-v2.sql
         <td class="cross">—</td>
         <td class="cross">—</td>
         <td class="check">✓</td>
-        <td class="check">✓ (OSS)</td>
       </tr>
       <tr>
         <td>prisma-to-graphql (custom scripts)</td>
@@ -392,7 +387,6 @@ schemaforge diff schema-v1.sql schema-v2.sql
         <td class="cross">—</td>
         <td class="cross">—</td>
         <td class="check">✓</td>
-        <td class="check">✓ (DIY)</td>
       </tr>
     </tbody>
   </table>
@@ -401,24 +395,12 @@ schemaforge diff schema-v1.sql schema-v2.sql
     Comparison based on public documentation as of June 2026. Verify current feature sets before making tool decisions.
   </p>
 
-  <h2>Pricing</h2>
-  <p>GraphQL SDL import/export (including the <code>sql → graphql</code> direction) requires Individual or higher. The free tier covers <code>convert</code> and <code>diff</code> for basic format pairs.</p>
-  <table class="pricing-table">
-    <thead>
-      <tr><th>Plan</th><th>Price</th><th>GraphQL SDL</th><th>Batch mode</th><th>Alembic gen</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Free</td><td>$0</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
-      <tr><td>Individual</td><td>$15/mo ($12 billed annually)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
-      <tr><td>Suite (all 11 tools)</td><td>$49/mo ($39 billed annually)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
-      <tr><td>Team (up to 5)</td><td>$79/mo ($63 billed annually)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
-    </tbody>
-  </table>
-  <p style="font-size:0.88rem;color:#555;">MIT license. No telemetry. Fully offline. No account required for the free tier.</p>
+  <h2>Supported conversion scope</h2>
+  <p>SchemaForge supports 11 formats and 100 documented conversion directions. Alembic is output-only. Tables, columns, types, defaults, indexes, unique constraints, and enums are preserved by the shared representation; review foreign-key constraints and ORM relationship fields after conversion because they are not retained.</p>
 
   <div class="cta-bar">
     <h3>Try SchemaForge</h3>
-    <p>Free tier available — install in 30 seconds, no account required.</p>
+    <p>Install from source while PyPI publishing is pending.</p>
     <a class="cta-btn" href="https://github.com/Coding-Dev-Tools/schemaforge" target="_blank" rel="noopener">View on GitHub →</a>
   </div>
 
@@ -449,7 +431,7 @@ schemaforge diff schema-v1.sql schema-v2.sql
     <details>
       <summary>Can I convert GraphQL SDL back to SQL?</summary>
       <div class="faq-body">
-        Yes — all 110 direction pairs are supported bidirectionally. <code>schemaforge convert --from graphql --to sql --input schema.graphql</code> works the same as the reverse. Roundtrips go through a shared internal representation with zero data loss.
+        Yes — SchemaForge supports 11 formats and 100 documented conversion directions. GraphQL SDL can be converted to SQL. Review foreign-key constraints and ORM relationship fields after conversion because the shared representation does not retain them. Alembic is output-only.
       </div>
     </details>
 
@@ -463,7 +445,7 @@ schemaforge diff schema-v1.sql schema-v2.sql
     <details>
       <summary>Is SchemaForge free?</summary>
       <div class="faq-body">
-        The free tier covers basic <code>convert</code> and <code>diff</code> for individual use at a rate limit. GraphQL SDL import/export, batch directory conversion, and Alembic migration generation require Individual ($15/mo) or higher. MIT license, no telemetry, fully offline — no account required for the free tier.
+        SchemaForge is MIT licensed and installed from source while PyPI publishing is pending. The README does not publish tier pricing; see the repository for current project information.
       </div>
     </details>
 
