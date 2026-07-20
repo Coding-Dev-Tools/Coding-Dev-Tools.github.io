@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Turn any OpenAPI spec into a working mock server | Revenue Holdings</title>
+<title>Turn any OpenAPI spec into a working mock server | Coding Dev Tools</title>
 <meta name="description" content="APIGhost reads an OpenAPI 3.x spec and spins up a mock server with realistic fake data, VCR recording, and scenario switching. MIT, Python 3.10+.">
 <script type="application/ld+json">
 {
@@ -38,7 +38,7 @@ apighost serve petstore.yaml
 <p>Most mock servers are either hand-maintained JSON or generated once and forgotten. When the spec changes, the mocks do not. APIGhost generates endpoints directly from the spec. Add a field to the schema, rerun the serve command, and the new field is there.</p>
 
 <h2>Record and replay</h2>
-<p>Deterministic tests need deterministic responses. <code>--record</code> captures real responses. <code>--replay</code> serves the same JSON every time.</p>
+<p>Deterministic tests need deterministic responses. <code>apighost record</code> captures real responses. <code>apighost replay</code> serves the same JSON every time.</p>
 <pre><code>apighost record petstore.yaml --output fixtures/cassette.json
 apighost replay fixtures/cassette.json -p 8080
 </code></pre>
