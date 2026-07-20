@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQL to GraphQL Schema Generator – SchemaForge CLI</title>
+  <meta name="description" content="Convert SQL DDL to GraphQL SDL with SchemaForge. Generate type definitions, enums, and scalars from an existing schema; review relationship details after conversion." />
+  <meta name="keywords" content="sql to graphql, generate graphql schema from sql, sql ddl to graphql sdl, graphql schema generator, database to graphql, schemaforge" />
+  <link rel="canonical" href="https://coding-dev-tools.github.io/sql-to-graphql-schema-generator.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="SQL to GraphQL Schema Generator – SchemaForge CLI" />
+  <meta property="og:description" content="Stop writing GraphQL types by hand. SchemaForge reads your SQL DDL and generates SDL types, enums, scalars, and directives automatically." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://coding-dev-tools.github.io/sql-to-graphql-schema-generator.html" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Convert SQL DDL to GraphQL SDL with SchemaForge",
+    "description": "Generate a complete GraphQL SDL schema from an existing SQL DDL file using the SchemaForge CLI. Covers installation, conversion, enum handling, and CI integration.",
+    "totalTime": "PT10M",
+    "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "0" },
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Install SchemaForge",
+        "text": "Install SchemaForge from the GitHub source: pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Run the conversion",
+        "text": "Convert your SQL file to GraphQL SDL: schemaforge convert --from sql --to graphql --input schema.sql --output schema.graphql"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Inspect and use the output",
+        "text": "Open schema.graphql — each SQL table becomes a GraphQL type with correctly mapped scalar types. ENUMs and UUID columns are handled automatically."
+      }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Can SchemaForge convert SQL to GraphQL automatically?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. SchemaForge reads SQL DDL and generates GraphQL SDL type definitions, converting column types to the correct GraphQL scalars (String, Int, Float, Boolean, ID, DateTime). It handles ENUMs, UUID columns, nullable fields, and function defaults like CURRENT_TIMESTAMP."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What SQL dialects does SchemaForge support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SchemaForge's SQL parser handles standard DDL including CREATE TABLE, ENGINE=InnoDB MySQL options, inline ENUM columns, AUTO_INCREMENT, and DEFAULT CHARSET. It also preserves function defaults (NOW(), gen_random_uuid()) across format boundaries using a fn: prefix convention."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it handle relationships and foreign keys?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SchemaForge converts table structures and column types. Relationship directives (e.g. @relation in some GraphQL schemas) are not auto-generated since foreign key semantics vary by GraphQL server — you add those manually after the initial conversion."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I convert GraphQL SDL back to SQL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SchemaForge supports 11 formats and 100 documented conversion directions. GraphQL SDL can be converted to SQL, but review foreign-key constraints and ORM relationship fields after conversion because the shared representation does not retain them. Alembic is output-only."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is SchemaForge free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SchemaForge is MIT licensed and installed from source while PyPI publishing is pending. The README does not publish tier pricing; see the repository for current project information."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      color: #1a1a2e;
+      background: #f8f9fc;
+      margin: 0;
+      padding: 0;
+      line-height: 1.65;
+    }
+    header {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+      color: #fff;
+      padding: 3rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.1rem; margin: 0 0 0.75rem; font-weight: 700; }
+    header p  { font-size: 1.1rem; opacity: 0.88; max-width: 680px; margin: 0 auto; }
+    .badge-row { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1.25rem; }
+    .badge {
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    main { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+    h2 { font-size: 1.5rem; color: #0f3460; margin-top: 2.5rem; }
+    h3 { font-size: 1.15rem; color: #16213e; margin-top: 2rem; }
+    p  { color: #333; margin: 0.6rem 0 1rem; }
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 10px;
+      padding: 1.1rem 1.4rem;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin: 1rem 0 1.5rem;
+    }
+    code { font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace; }
+    .comment { color: #6c7086; }
+    .cmd-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #0f3460;
+      margin: 1.5rem 0 0.35rem;
+    }
+    .callout {
+      border-left: 4px solid #e94560;
+      background: #fff4f6;
+      border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1.2rem;
+      margin: 1.4rem 0;
+      font-size: 0.95rem;
+      color: #444;
+    }
+    .callout strong { color: #e94560; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: 0.93rem;
+    }
+    th {
+      background: #0f3460;
+      color: #fff;
+      padding: 0.55rem 0.8rem;
+      text-align: left;
+    }
+    td { padding: 0.5rem 0.8rem; border-bottom: 1px solid #e8eaf0; }
+    tr:nth-child(even) td { background: #f4f6fb; }
+    .comparison { margin-top: 2rem; }
+    .comparison table th:first-child { min-width: 150px; }
+    .check { color: #25a244; font-weight: 700; }
+    .cross { color: #cc3333; }
+    .pricing-table th { min-width: 100px; text-align: center; }
+    .pricing-table td { text-align: center; }
+    .pricing-table td:first-child { text-align: left; font-weight: 600; }
+    .cta-bar {
+      background: linear-gradient(135deg, #0f3460, #16213e);
+      color: #fff;
+      border-radius: 14px;
+      padding: 2rem 2.2rem;
+      margin: 3rem 0 2rem;
+      text-align: center;
+    }
+    .cta-bar h3 { color: #fff; margin: 0 0 0.6rem; font-size: 1.3rem; }
+    .cta-bar p  { opacity: 0.88; margin: 0 0 1.2rem; }
+    .cta-btn {
+      display: inline-block;
+      background: #e94560;
+      color: #fff;
+      padding: 0.7rem 1.6rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: opacity 0.2s;
+    }
+    .cta-btn:hover { opacity: 0.85; }
+    .faq { margin-top: 2.5rem; }
+    .faq details { border: 1px solid #dde2ef; border-radius: 8px; margin-bottom: 0.75rem; }
+    .faq summary {
+      cursor: pointer;
+      padding: 0.9rem 1.1rem;
+      font-weight: 600;
+      color: #0f3460;
+      list-style: none;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::before { content: '▶  '; font-size: 0.7rem; }
+    .faq details[open] summary::before { content: '▼  '; }
+    .faq .faq-body { padding: 0 1.1rem 0.9rem; color: #444; font-size: 0.95rem; }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.85rem;
+      color: #888;
+      border-top: 1px solid #dde2ef;
+    }
+    footer a { color: #0f3460; text-decoration: none; }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      main { padding: 2rem 1rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>SQL to GraphQL Schema Generator</h1>
+  <p>Convert SQL DDL to GraphQL SDL in one command. Stop writing type definitions by hand — SchemaForge reads your database schema and generates them automatically.</p>
+  <div class="badge-row">
+    <span class="badge">11 formats</span>
+    <span class="badge">100 documented directions</span>
+    <span class="badge">MIT license</span>
+    <span class="badge">Python 3.10+</span>
+  </div>
+</header>
+
+<main>
+
+  <h2>The problem with writing GraphQL types by hand</h2>
+  <p>
+    You have a SQL schema with 20 tables. Your backend team wants a GraphQL API. Someone sits down and writes the SDL by hand — copying column names, converting <code>VARCHAR(255)</code> to <code>String</code>, <code>BOOLEAN</code> to <code>Boolean</code>, <code>UUID</code> to <code>ID</code>. Then the database schema changes and the SDL is already out of date.
+  </p>
+  <p>
+    SchemaForge converts SQL DDL to GraphQL SDL automatically. Each table becomes a type. Column types map to GraphQL scalars. ENUMs become GraphQL enums. Nullable columns become optional fields. Review the generated output before use, especially relationship details: the shared representation does not retain foreign-key constraints or ORM relationship fields.
+  </p>
+
+  <h2>Quick start</h2>
+
+  <p class="cmd-label">1 — Install</p>
+  <pre><code><span class="comment"># Install from GitHub (PyPI publishing pending)</span>
+pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git</code></pre>
+
+  <p class="cmd-label">2 — Convert your SQL file</p>
+  <pre><code>schemaforge convert --from sql --to graphql --input schema.sql --output schema.graphql</code></pre>
+
+  <p class="cmd-label">3 — Check the output</p>
+  <pre><code><span class="comment"># schema.graphql — generated from your SQL DDL</span>
+type User {
+  id: ID!
+  email: String!
+  name: String
+  role: UserRole!
+  createdAt: String
+}
+
+enum UserRole {
+  admin
+  member
+  viewer
+}
+
+type Post {
+  id: ID!
+  authorId: ID!
+  title: String!
+  body: String
+  publishedAt: String
+}</code></pre>
+
+  <p>
+    Each SQL table maps to a GraphQL type. <code>NOT NULL</code> columns become non-nullable fields (<code>!</code>). <code>PRIMARY KEY UUID</code> columns map to <code>ID</code>. <code>ENUM</code> columns generate a separate enum type. Function defaults like <code>CURRENT_TIMESTAMP</code> and <code>gen_random_uuid()</code> survive the conversion.
+  </p>
+
+  <h2>Type mapping reference</h2>
+  <p>SchemaForge maps SQL column types to GraphQL scalars using a shared internal representation. Here's how the common types convert:</p>
+
+  <table>
+    <thead>
+      <tr><th>SQL DDL Type</th><th>GraphQL Scalar</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>VARCHAR(n)</code>, <code>TEXT</code>, <code>CHAR(n)</code></td><td><code>String</code></td><td>—</td></tr>
+      <tr><td><code>INTEGER</code>, <code>INT</code>, <code>SMALLINT</code>, <code>BIGINT</code></td><td><code>Int</code></td><td>—</td></tr>
+      <tr><td><code>FLOAT</code>, <code>REAL</code>, <code>DOUBLE</code></td><td><code>Float</code></td><td>—</td></tr>
+      <tr><td><code>BOOLEAN</code>, <code>BOOL</code></td><td><code>Boolean</code></td><td>—</td></tr>
+      <tr><td><code>UUID</code></td><td><code>ID</code></td><td>Mapped to GraphQL's ID scalar</td></tr>
+      <tr><td><code>TIMESTAMP</code>, <code>DATETIME</code>, <code>DATE</code>, <code>TIME</code></td><td><code>String</code></td><td>Custom DateTime scalar if preferred</td></tr>
+      <tr><td><code>JSON</code>, <code>JSONB</code></td><td><code>JSON</code> (custom scalar)</td><td>—</td></tr>
+      <tr><td><code>DECIMAL(p,s)</code>, <code>NUMERIC(p,s)</code></td><td><code>Float</code></td><td>—</td></tr>
+      <tr><td><code>ENUM('a','b','c')</code></td><td>GraphQL enum type</td><td>Auto-generates separate enum definition</td></tr>
+      <tr><td><code>BLOB</code>, <code>BYTEA</code></td><td><code>String</code></td><td>Encoded representation</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Review relationship details:</strong> SchemaForge's shared representation does not retain foreign-key constraints or ORM relationship fields. Add GraphQL relationship semantics afterward based on your GraphQL server's conventions.
+  </div>
+
+  <h2>More conversion examples</h2>
+
+  <p class="cmd-label">Generate GraphQL from a Prisma schema</p>
+  <pre><code>schemaforge convert --from prisma --to graphql --input schema.prisma --output schema.graphql</code></pre>
+
+  <p class="cmd-label">Convert GraphQL back to SQL DDL</p>
+  <pre><code><span class="comment"># Bidirectional — graphql → sql is fully supported</span>
+schemaforge convert --from graphql --to sql --input schema.graphql --output schema.sql</code></pre>
+
+  <p class="cmd-label">Batch convert a directory of SQL files</p>
+  <pre><code>schemaforge check --dir ./schemas/ --canonical sql
+<span class="comment"># Checks all schema files in the directory for consistency</span>
+<span class="comment"># Use with --canonical to verify all formats roundtrip through a single source of truth</span></code></pre>
+
+  <p class="cmd-label">Diff two versions of your schema</p>
+  <pre><code><span class="comment"># Catch breaking changes before they land in production</span>
+schemaforge diff schema-v1.sql schema-v2.sql
+<span class="comment"># Reports added/removed/modified tables, columns, indexes, and constraints</span></code></pre>
+
+  <h2>CI integration</h2>
+  <p>Add schema consistency checks to your CI pipeline to catch drift early:</p>
+  <pre><code><span class="comment"># .github/workflows/schema-check.yml (excerpt)</span>
+- name: Check schema consistency
+  run: |
+    pip install git+https://github.com/Coding-Dev-Tools/schemaforge.git
+    schemaforge diff schemas/current.sql schemas/expected.sql
+    schemaforge check --dir schemas/</code></pre>
+
+  <p>
+    <code>schemaforge diff</code> exits non-zero when it finds differences, so the job fails if the schemas diverge. Pair it with the <code>check</code> command to verify consistency across all formats in a directory.
+  </p>
+
+  <h2>VS Code extension</h2>
+  <p>
+    The <a href="https://marketplace.visualstudio.com/items?itemName=revenue-holdings.vscode-schemaforge" target="_blank" rel="noopener">SchemaForge VS Code extension</a> lets you preview your schema converted to all 11 formats in a side panel as you edit. Open any <code>.sql</code>, <code>.prisma</code>, or <code>.graphql</code> file and run <em>SchemaForge: Show Preview</em> from the command palette to see the GraphQL SDL output live.
+  </p>
+
+  <h2>How SchemaForge compares</h2>
+  <div class="comparison">
+  <table>
+    <thead>
+      <tr>
+        <th>Tool</th>
+        <th>SQL → GraphQL</th>
+        <th>GraphQL → SQL</th>
+        <th>Bidirectional (11 formats)</th>
+        <th>Local / offline</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>SchemaForge</strong></td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Hasura (hosted)</td>
+        <td class="check">✓</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="cross">Hosted SaaS</td>
+      </tr>
+      <tr>
+        <td>graphql-code-generator</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>prisma-to-graphql (custom scripts)</td>
+        <td class="cross">Partial</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="check">✓</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:0.82rem;color:#888;">
+    Comparison based on public documentation as of June 2026. Verify current feature sets before making tool decisions.
+  </p>
+
+  <h2>Supported conversion scope</h2>
+  <p>SchemaForge supports 11 formats and 100 documented conversion directions. Alembic is output-only. Tables, columns, types, defaults, indexes, unique constraints, and enums are preserved by the shared representation; review foreign-key constraints and ORM relationship fields after conversion because they are not retained.</p>
+
+  <div class="cta-bar">
+    <h3>Try SchemaForge</h3>
+    <p>Install from source while PyPI publishing is pending.</p>
+    <a class="cta-btn" href="https://github.com/Coding-Dev-Tools/schemaforge" target="_blank" rel="noopener">View on GitHub →</a>
+  </div>
+
+  <div class="faq">
+    <h2>Frequently asked questions</h2>
+
+    <details>
+      <summary>Can SchemaForge convert SQL to GraphQL automatically?</summary>
+      <div class="faq-body">
+        Yes. SchemaForge reads SQL DDL and generates GraphQL SDL type definitions, converting column types to the correct GraphQL scalars (String, Int, Float, Boolean, ID). It handles ENUMs, UUID columns, nullable fields, and function defaults like <code>CURRENT_TIMESTAMP</code> and <code>gen_random_uuid()</code>.
+      </div>
+    </details>
+
+    <details>
+      <summary>What SQL dialects are supported?</summary>
+      <div class="faq-body">
+        SchemaForge's SQL parser handles standard DDL including <code>CREATE TABLE</code>, MySQL-specific options (<code>ENGINE=InnoDB</code>, <code>AUTO_INCREMENT</code>, <code>DEFAULT CHARSET</code>), inline <code>ENUM</code> columns, and table <code>COMMENT</code>. Function defaults (<code>NOW()</code>, <code>gen_random_uuid()</code>) are preserved using an internal <code>fn:</code> prefix convention so they survive roundtrips.
+      </div>
+    </details>
+
+    <details>
+      <summary>Does it handle relationships and foreign keys?</summary>
+      <div class="faq-body">
+        SchemaForge converts table structures and column types to their GraphQL equivalents. Relationship directives vary by GraphQL server (Apollo Federation <code>@link</code>, Neo4j <code>@relationship</code>, etc.), so those are not auto-generated — you add them manually after the initial conversion, which takes seconds per relationship.
+      </div>
+    </details>
+
+    <details>
+      <summary>Can I convert GraphQL SDL back to SQL?</summary>
+      <div class="faq-body">
+        Yes — SchemaForge supports 11 formats and 100 documented conversion directions. GraphQL SDL can be converted to SQL. Review foreign-key constraints and ORM relationship fields after conversion because the shared representation does not retain them. Alembic is output-only.
+      </div>
+    </details>
+
+    <details>
+      <summary>Is the GraphQL SDL output standard?</summary>
+      <div class="faq-body">
+        SchemaForge generates standard SDL that any GraphQL server can consume — Apollo Server, GraphQL Yoga, Strawberry, Mercurius, etc. You may need to add server-specific directives (resolvers, federation annotations) depending on your stack, but the type definitions and enums are plain SDL.
+      </div>
+    </details>
+
+    <details>
+      <summary>Is SchemaForge free?</summary>
+      <div class="faq-body">
+        SchemaForge is MIT licensed and installed from source while PyPI publishing is pending. The README does not publish tier pricing; see the repository for current project information.
+      </div>
+    </details>
+
+    <details>
+      <summary>Can I use SchemaForge in an AI coding agent?</summary>
+      <div class="faq-body">
+        Yes — SchemaForge ships an <strong>MCP server</strong> (<code>schemaforge mcp</code>) that exposes <code>convert</code>, <code>diff</code>, <code>check</code>, <code>formats</code>, and <code>detect_format</code> as tools. It works with Claude Code, Cursor, and any MCP-compatible AI client. Install with <code>pip install "schemaforge[mcp] @ git+https://github.com/Coding-Dev-Tools/schemaforge.git"</code>.
+      </div>
+    </details>
+  </div>
+
+</main>
+
+<footer>
+  <p>Part of the <a href="https://coding-dev-tools.github.io/">Revenue Holdings developer CLI suite</a> ·
+    <a href="https://github.com/Coding-Dev-Tools/schemaforge">SchemaForge on GitHub</a> ·
+    See also: <a href="./prisma-to-drizzle-migration.html">Prisma → Drizzle Migration</a> ·
+    <a href="./openapi-mock-server-comparison.html">OpenAPI Mock Server Comparison</a>
+  </p>
+</footer>
+
+</body>
+</html>

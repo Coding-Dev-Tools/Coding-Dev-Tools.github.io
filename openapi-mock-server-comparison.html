@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenAPI Mock Server Comparison: APIGhost vs Prism vs WireMock vs Mockoon</title>
+  <meta name="description" content="An honest, side-by-side comparison of four OpenAPI mock server tools — APIGhost, Stoplight Prism, WireMock, and Mockoon — covering spec-driven mocking, fake data, record/replay, scenarios, runtime, and install.">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/openapi-mock-server-comparison.html">
+  <meta property="og:title" content="OpenAPI Mock Server Comparison: APIGhost vs Prism vs WireMock vs Mockoon">
+  <meta property="og:description" content="Honest side-by-side comparison of four OpenAPI mock server tools — spec-driven mocking, fake data, record/replay, scenarios, runtime, and install.">
+  <meta property="og:type" content="article">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --green: #10b981;
+      --amber: #d29922;
+      --red: #f85149;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: var(--accent-light); }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: white;
+    }
+    .brand { font-size: 20px; font-weight: 700; text-decoration: none; color: var(--text); }
+    .brand span { color: var(--accent-light); }
+    main { max-width: 880px; margin: 0 auto; padding: 56px 24px 80px; }
+    h1 { font-size: 38px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    h1 .highlight { color: var(--accent-light); }
+    .lede { font-size: 19px; color: var(--muted); margin-bottom: 28px; }
+    h2 { font-size: 26px; font-weight: 700; margin: 44px 0 16px; }
+    h3 { font-size: 19px; font-weight: 600; margin: 24px 0 8px; }
+    p { margin-bottom: 16px; }
+    .updated { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    .pick {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 8px 0 16px;
+    }
+    .pick strong { color: var(--text); }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 8px; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--surface); font-weight: 600; }
+    td.feat { font-weight: 500; }
+    .yes { color: var(--green); font-weight: 700; }
+    .partial { color: var(--amber); font-weight: 700; }
+    .no { color: var(--red); font-weight: 700; }
+    .legend { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-size: 14px;
+      margin: 8px 0 16px;
+    }
+    code { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 0.92em; }
+    .cta {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 11px 26px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .cta:hover { background: var(--accent-light); }
+    .note { font-size: 14px; color: var(--muted); }
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    footer a { text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">D</div>
+    <a class="brand" href="/">Dev<span>Forge</span></a>
+  </header>
+
+  <main>
+    <h1>OpenAPI Mock Server Comparison:<br><span class="highlight">APIGhost vs Prism vs WireMock vs Mockoon</span></h1>
+    <p class="lede">Four solid ways to stand up a mock API from an OpenAPI spec. They overlap a lot, but each has a different sweet spot. Here is an honest, side-by-side look so you can pick the right one for your stack.</p>
+    <p class="updated">Last reviewed: June 2026. Tool capabilities change — links to each project's docs are included so you can verify the current state.</p>
+
+    <h2>Quick pick</h2>
+    <div class="pick"><strong>You are a Python team and want one CLI that does it all.</strong> Use <strong>APIGhost</strong> — generate a mock from your spec, plus VCR-style record/replay and named edge-case scenarios, installed with <code>pip</code>.</div>
+    <div class="pick"><strong>You want the most mature spec-driven mock + a validation proxy (Node).</strong> Use <strong>Prism</strong> by Stoplight.</div>
+    <div class="pick"><strong>You need heavyweight stubbing, fault injection, and record-and-playback on the JVM.</strong> Use <strong>WireMock</strong>.</div>
+    <div class="pick"><strong>You want a visual editor to design and tweak mocks by hand.</strong> Use <strong>Mockoon</strong> (it also has a CLI and Docker image).</div>
+
+    <h2>Feature comparison</h2>
+    <table>
+      <thead>
+        <tr><th>Capability</th><th>APIGhost</th><th>Prism</th><th>WireMock</th><th>Mockoon</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="feat">Mock generated directly from an OpenAPI spec (no stub-writing)</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="partial">Partial</td><td class="yes">Yes</td></tr>
+        <tr><td class="feat">Schema-aware fake data</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="partial">Partial</td><td class="yes">Yes</td></tr>
+        <tr><td class="feat">VCR-style record &amp; replay (deterministic cassettes)</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td><td class="partial">Partial</td></tr>
+        <tr><td class="feat">Named scenario presets for edge cases</td><td class="yes">Yes</td><td class="partial">Partial</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+        <tr><td class="feat">Runs headless from the CLI</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+        <tr><td class="feat">Visual editor / GUI</td><td class="no">No</td><td class="no">No</td><td class="partial">Cloud</td><td class="yes">Yes</td></tr>
+        <tr><td class="feat">Runtime &amp; install</td><td>Python &middot; <code>pip</code></td><td>Node &middot; <code>npm</code></td><td>JVM &middot; jar / Docker</td><td>Node &middot; <code>npm</code> / app</td></tr>
+      </tbody>
+    </table>
+    <p class="legend"><span class="yes">Yes</span> = built-in &nbsp;|&nbsp; <span class="partial">Partial</span> = available via an add-on, proxy mode, or hosted tier &nbsp;|&nbsp; <span class="no">No</span> = not supported. "Partial" notes are explained per tool below.</p>
+
+    <h2>APIGhost</h2>
+    <p>APIGhost is a Python CLI that turns an OpenAPI 3.0/3.1 spec into a running mock server in one command, populates it with Faker-powered fake data keyed off property names, and adds two things most spec-driven mocks don't bundle: VCR-style record/replay cassettes for deterministic test runs, and named scenario presets for exercising edge cases like error responses.</p>
+    <pre><code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+# or via Homebrew (macOS/Linux):
+# brew tap Coding-Dev-Tools/homebrew-tap && brew install apighost
+apighost serve petstore.yaml          # mock from a spec
+apighost serve spec.yaml --scenario error
+apighost record petstore.yaml          # capture a deterministic cassette
+apighost replay my-recording           # replay it forever</code></pre>
+    <p class="note">APIGhost is not on public PyPI and its self-hosted index is currently unavailable. The <code>git+</code> command above is the documented working pip install path. Homebrew is also a verified install option on macOS and Linux.</p>
+    <p>Best fit: Python-centric teams who want spec-driven mocking <em>and</em> deterministic replay <em>and</em> scenario switching from a single <code>pip install</code>, without bringing in a Node toolchain or the JVM. Free for local/dev use; a Pro tier ($12/mo) adds unlimited requests, VCR cassettes, and CI/CD integration. <a href="https://github.com/Coding-Dev-Tools/apighost">Repo &amp; docs &rarr;</a></p>
+
+    <h2>Stoplight Prism</h2>
+    <p>Prism is a mature, open-source Node CLI that turns OpenAPI v2/v3 (and Postman) documents into a mock server. Run it with the <code>-d</code> flag and it generates dynamic, schema-valid data via Faker.js. It also works as a validation proxy in front of a real API. You can steer which example or status code it returns using the HTTP <code>Prefer</code> header (for example <code>Prefer: example=...</code> or <code>Prefer: code=...</code>) — that is the "Partial" mark in the scenarios row: it is example selection rather than saved, named presets. Prism has no VCR-style cassette record/replay.</p>
+    <p>Best fit: Node teams who want the most established spec-driven mock plus request validation. <a href="https://stoplight.io/open-source/prism">Project page &rarr;</a></p>
+
+    <h2>WireMock</h2>
+    <p>WireMock is a heavyweight, battle-tested API mocking tool on the JVM. Its core strengths are rich request matching, stateful Scenarios, fault and latency injection, and a genuine record-and-playback mode (proxy an existing API, then snapshot the traffic into stub mappings). The "Partial" mark on spec-driven generation reflects that WireMock's OSS core is oriented around stub mappings and proxy recording; auto-generating stubs straight from an OpenAPI document is strongest in WireMock Cloud and extensions rather than the base CLI. Its fake-data story is Handlebars templating with helpers rather than schema-derived generation.</p>
+    <p>Best fit: JVM shops, or anyone who needs the richest stubbing, stateful behavior, and resilience testing. <a href="https://wiremock.org/">Project site &rarr;</a></p>
+
+    <h2>Mockoon</h2>
+    <p>Mockoon is best known for its friendly desktop GUI for designing mock APIs by hand, but it also ships an official CLI (<code>@mockoon/cli</code>), a Docker image, and a GitHub Action, so it runs headless in CI too. It can import an OpenAPI document, supports templating with Faker helpers, route response rules, and a proxy mode (the "Partial" record mark — proxy mode can capture and log calls rather than producing VCR cassettes).</p>
+    <p>Best fit: teams who want to visually design and tweak mocks, then export/run them from the CLI. <a href="https://mockoon.com/">Project site &rarr;</a></p>
+
+    <h2>So which should you use?</h2>
+    <p>If your stack is Python and you want spec-driven mocking, deterministic record/replay, and named scenarios in one lightweight CLI, APIGhost is the most direct fit. Prism is the closest Node-based alternative for pure spec-driven mocking and validation. WireMock is the right call when you need heavyweight stubbing and record-and-playback on the JVM. Mockoon wins when a visual editor matters. All four are honest, capable tools — the best choice is mostly about your runtime and whether record/replay and scenarios are part of your workflow.</p>
+
+    <p style="margin-top:24px;"><a class="cta" href="https://github.com/Coding-Dev-Tools/apighost">Try APIGhost on GitHub</a></p>
+    <p class="note" style="margin-top:14px;"><a href="/">&larr; Back to the DevForge toolkit</a></p>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 <a href="https://github.com/Coding-Dev-Tools">Coding Dev Tools</a> &mdash; MIT License</p>
+  </footer>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the best OpenAPI mock server?",
+        "acceptedAnswer": {"@type": "Answer", "text": "It depends on your runtime. APIGhost is a Python CLI that generates a mock from a spec and adds VCR record/replay and named scenarios. Stoplight Prism is the mature Node option for spec-driven mocking and validation. WireMock is the JVM choice for heavyweight stubbing and record-and-playback. Mockoon offers a visual editor plus a CLI."}
+      },
+      {
+        "@type": "Question",
+        "name": "Does Prism support record and replay?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Prism works as a mock and as a validation proxy, but it does not provide VCR-style cassette record/replay. Example selection is done via the HTTP Prefer header rather than saved scenario presets."}
+      },
+      {
+        "@type": "Question",
+        "name": "Does Mockoon have a command-line interface?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Yes. In addition to its desktop GUI, Mockoon ships an official CLI (@mockoon/cli), a Docker image, and a GitHub Action, so it can run mock APIs headless in CI."}
+      }
+    ]
+  }
+  </script>
+</body>
+</html>

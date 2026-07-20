@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting started with APIGhost for integration tests | Coding Dev Tools</title>
+<meta name="description" content="A quickstart guide to mocking APIs with APIGhost — install, serve a spec, record interactions for CI, and replay them deterministically.">
+</head>
+<body>
+<h1>Getting started with APIGhost for integration tests</h1>
+<p>Integration tests need a stable API to hit. Hard-coding responses breaks the moment a field changes, and hand-written mocks drift as soon as the spec updates.</p>
+<p>APIGhost reads an OpenAPI 3.x spec and starts a mock server with realistic fake data. Here is the shortest path from "I have a spec" to "my tests pass."</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+</code></pre>
+<p>APIGhost is not on public PyPI. If you use Homebrew, the tap is also available: <code>brew tap Coding-Dev-Tools/homebrew-tap &amp;&amp; brew install apighost</code>.</p>
+
+<h2>Three commands to get running</h2>
+<p>Point APIGhost at a spec file and it generates endpoints with fake data. Property-name hints do the heavy lifting: <code>email</code> fields get emails, <code>id</code> fields get IDs.</p>
+<pre><code>apighost serve petstore.yaml
+</code></pre>
+<p>That starts a server on port 8080. Hit it like you would hit the real API.</p>
+
+<h2>Record once, replay forever</h2>
+<p>For CI, deterministic responses matter more than faker randomness.</p>
+<pre><code>apighost record petstore.yaml --output fixtures/cassette.json
+apighost replay fixtures/cassette.json -p 8080
+</code></pre>
+<p>The record step captures real responses. The replay step serves the same JSON every time. Your tests no longer depend on faker seeds or a live upstream.</p>
+
+<h2>Edge cases without editing fixtures</h2>
+<p>APIGhost ships with named scenario presets. Add an error scenario once and flip to it with a flag:</p>
+<pre><code>apighost serve spec.yaml --scenario error
+</code></pre>
+<p>You can also create custom scenarios: <code>apighost scenario create error-test -d "API error scenarios"</code>, then edit specific routes and status codes.</p>
+
+<h2>When the spec changes, the mock changes</h2>
+<p>Regenerate the fixtures from the spec and the endpoints, fields, and response shapes update together. No copy-pasted JSON to maintain.</p>
+
+<h2>Pricing</h2>
+<p>Free tier covers local and dev use. Pro is $12/mo (or $119/yr) for unlimited requests, VCR cassettes, and CI integration. Suite is $49/mo for all Coding-Dev-Tools tools under one license.</p>
+
+<h2>Where to go next</h2>
+<p>If you want the full CI walkthrough — GitHub Actions, pytest examples, scenario switching in automation — the companion tutorial covers the six-step path from spec to CI.</p>
+
+<footer>
+  <p>MIT, Python 3.10+. Repo: <a href="https://github.com/Coding-Dev-Tools/apighost">github.com/Coding-Dev-Tools/apighost</a></p>
+</footer>
+</body>
+</html>

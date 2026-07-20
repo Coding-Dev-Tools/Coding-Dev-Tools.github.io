@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Turn Any Click CLI into an MCP Server in One Command</title>
+  <meta name="description" content="Wrap any Click or Typer Python CLI as an MCP server with zero boilerplate. Supports stdio and HTTP+SSE transport for Claude Code, Cursor, and VS Code.">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/click-to-mcp.html">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --green: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: white;
+    }
+    .brand { font-size: 20px; font-weight: 700; }
+    .brand span { color: var(--accent-light); }
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    h1 { font-size: 36px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+    h2 { font-size: 24px; font-weight: 700; margin-top: 40px; margin-bottom: 16px; }
+    p { margin-bottom: 16px; color: var(--muted); }
+    code {
+      background: rgba(110,118,129,0.2);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.95em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: 14px;
+    }
+    ul { margin: 0 0 16px 24px; color: var(--muted); }
+    li { margin-bottom: 8px; }
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .step-number {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 28px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-right: 8px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 24px 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th {
+      background: var(--surface);
+      font-weight: 600;
+    }
+    .cta {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 24px;
+    }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    footer a { color: var(--accent-light); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Wrap a Click CLI as an MCP server",
+    "description": "Turn any Click or Typer Python CLI into an MCP server with click-to-mcp. Supports stdio and HTTP+SSE transport.",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Install click-to-mcp",
+        "text": "pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git"
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Serve your CLI",
+        "text": "click-to-mcp serve your-cli-name"
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Configure your MCP client",
+        "text": "Add the generated config to Claude Code, Cursor, or VS Code MCP settings."
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Do I need to modify my Click CLI?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. click-to-mcp wraps your existing Click or Typer CLI automatically. No annotations, no decorators, no code changes required."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which MCP clients work with click-to-mcp?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude Code, Cursor, Cline, and VS Code MCP clients. It implements the standard MCP protocol over stdio and HTTP+SSE."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is there a hosted version?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. click-to-mcp runs locally — stdio for local agents, HTTP+SSE for web clients. It is free and open source under Apache 2.0."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="logo">D</div>
+    <div class="brand">Dev<span>Forge</span></div>
+  </header>
+
+  <main>
+    <h1>Turn any Click CLI into an MCP server in one command</h1>
+
+    <p>If you have a Python CLI built with Click or Typer, you can expose it to AI agents in a single step. No boilerplate, no manual JSON schema, no keep-in-sync headache.</p>
+
+    <pre><code>pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git
+click-to-mcp serve your-cli-name</code></pre>
+
+    <p>That is it. Your CLI is now an MCP server. Claude Code, Cursor, and VS Code can call every command and option as native MCP tools.</p>
+
+    <h2>What it actually does</h2>
+
+    <p>click-to-mcp introspects your CLI at runtime. It maps Click concepts directly to MCP tool definitions:</p>
+
+    <ul>
+      <li><code>@click.command()</code> becomes an MCP tool</li>
+      <li><code>@click.argument()</code> becomes a required input property</li>
+      <li><code>@click.option()</code> becomes an optional input property with its default</li>
+      <li><code>click.Choice</code> becomes a JSON Schema <code>enum</code></li>
+      <li>Nested command groups get prefixed tool names like <code>config_show</code></li>
+    </ul>
+
+    <p>You do not write schema files. You do not annotate your CLI. The existing Click app becomes the MCP server.</p>
+
+    <h2>Two transport modes</h2>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <strong>Stdio</strong>
+      <p style="margin-top:8px">Best for local agents like Claude Code, Cursor, and Cline. No extra dependencies.</p>
+      <code>click-to-mcp serve your-cli</code>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <strong>HTTP+SSE</strong>
+      <p style="margin-top:8px">Best for web-based MCP clients. Requires the <code>http</code> extra.</p>
+      <code>pip install "click-to-mcp[http] @ git+https://github.com/Coding-Dev-Tools/click-to-mcp.git"</code>
+      <code>click-to-mcp serve-http your-cli --port 8000</code>
+    </div>
+
+    <h2>Works with DevForge CLIs out of the box</h2>
+
+    <p>We use it internally for <code>api-contract-guardian</code>, <code>json2sql</code>, <code>deploydiff</code>, and <code>configdrift</code>. Each of those has 10+ commands and options. Without this tool, each would need a hand-written MCP wrapper that breaks every time the CLI changes.</p>
+
+    <p>With click-to-mcp, the wrapper is zero lines of code.</p>
+
+    <h2>Try it</h2>
+
+    <pre><code># Discover installed Click/typer CLIs
+click-to-mcp discover
+
+# Preview tools without starting a server
+click-to-mcp list-tools api-contract-guardian
+
+# Serve it
+click-to-mcp serve api-contract-guardian
+
+# Generate client config
+click-to-mcp config api-contract-guardian --client vscode</code></pre>
+
+    <p>MIT/Apache 2.0, no account, no telemetry. Install from PyPI or Homebrew.</p>
+
+    <a class="cta" href="https://github.com/Coding-Dev-Tools/click-to-mcp">View on GitHub</a>
+  </main>
+
+  <footer>
+    <p>DevForge &mdash; developer CLI tools built by Coding Dev Tools</p>
+  </footer>
+</body>
+</html>

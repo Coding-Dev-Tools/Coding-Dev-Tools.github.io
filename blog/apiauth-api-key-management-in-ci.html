@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rotate API keys in CI without leaking them | Revenue Holdings</title>
+<meta name="description" content="APIAuth is a terminal key manager that generates, rotates, and audits API keys with an encrypted local keystore — no account, no telemetry, no SaaS login.">
+</head>
+<body>
+<h1>Rotate API keys in CI without leaking them</h1>
+<p>API keys end up in CI logs after almost every deploy. Some are old, some are still active, and nobody remembers who generated them.</p>
+<p>APIAuth is a terminal key manager that keeps keys on your machine. You generate, rotate, and audit them from the CLI. No hosted dashboard, no phone-home telemetry, no SaaS login.</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/apiauth.git
+apiauth generate api-key --name "CI Key" --service "api-gateway" --expiry-days 90
+</code></pre>
+
+<h2>What it does</h2>
+<ul>
+<li>generates API keys and JWTs with expiry dates</li>
+<li>imports existing keys into an AES-256-GCM encrypted keystore</li>
+<li>rotates a key in place and hashes the previous value</li>
+<li>audits the keystore for expired or revoked keys</li>
+<li>exports keys in env, dotenv, JSON, or GitHub Actions format</li>
+<li>verifies keys against stored hashes without revealing plaintext</li>
+<li>runs entirely offline — master key stays in <code>~/.apiauth/</code></li>
+</ul>
+
+<h2>CI workflow</h2>
+<p>Rotate keys as part of deploy, not as a manual ticket. Rotate in the branch, land it, and export the value straight into the runner:</p>
+<pre><code>apiauth rotate <key-id>
+apiauth audit --exit-on-expired
+apiauth export --format github-actions --service production
+</code></pre>
+<p><code>apiauth audit --exit-on-expired</code> exits non-zero if anything is stale, so the deploy stops before the bad key ships.</p>
+
+<h2>Pricing</h2>
+<p>Free covers generate, verify, and env-format export for up to 5 keys. Audit, stats, JWT claims, and GitHub Actions export unlock at <code>$12/mo</code>. A Suite license covering all 11 Revenue Holdings tools is <code>$49/mo</code>.</p>
+
+<h2>Verification notes</h2>
+<p>Claims sourced from <code>apiauth/README.md</code> and cross-checked against <code>Obsidian-Vault-Local/40-Marketing/verified-facts-ledger.md</code> (last verified 2026-07-02). Install is not public PyPI. Working paths: <code>pip install git+https://github.com/Coding-Dev-Tools/apiauth.git</code> or <code>pip install git+https://github.com/Coding-Dev-Tools/apiauth.git</code>. Pricing table: Free $0 (5 keys), Individual $12/mo ($10/yr), Suite $49/mo ($39/yr), Team $79/mo ($63/yr), Enterprise custom. License: MIT. Python 3.10+. The README contains unresolved merge-conflict markers after the footer paragraph; claims here are drawn from the clean section only.</p>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convert nested JSON to relational SQL tables with json2sql | Revenue Holdings</title>
+<meta name="description" content="Turn nested JSON — objects, arrays, and deeply composed structures — into normalized SQL INSERT statements. json2sql's --flatten mode auto-creates relational tables from nested data for PostgreSQL, MySQL, and SQLite. Free tier, no telemetry.">
+</head>
+<body>
+<h1>Convert nested JSON into relational SQL tables with json2sql</h1>
+<p>Real-world JSON is rarely flat. An API response is a user object with an embedded <code>address</code> object and an <code>orders</code> array; a webhook payload nests metadata three levels deep; an event stream wraps fields in <code>data</code> and <code>context</code> objects. If you load that JSON straight into a relational database, you end up either stuffing an entire blob into a single <code>JSON</code> column (unqueryable) or hand-writing a flattening script that breaks the moment the schema shifts. <strong>json2sql</strong> solves the middle path: give it nested JSON and the <code>--flatten</code> flag, and it generates normalized SQL INSERT statements across multiple relational tables — automatically.</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/json2sql.git
+</code></pre>
+<p>json2sql is <strong>not</strong> published on public PyPI (publishing is pending), so a bare <code>pip install json2sql-cli</code> will fail — use the <code>git+</code> command above. It is MIT-licensed, requires only Python 3.10+, and runs fully offline on the free tier — no telemetry, no phone-home, no account required. Homebrew and Scoop distribution is planned but not yet published.</p>
+
+<h2>Flatten a nested object into linked tables</h2>
+<p>Consider a user record where the address is an embedded object:</p>
+<pre><code>// user.json
+{
+  "id": 1,
+  "name": "Ada Lovelace",
+  "address": {
+    "street": "12 Analytical Way",
+    "city": "London",
+    "zip": "EC1A"
+  }
+}
+</code></pre>
+<p>Run json2sql with <code>--flatten</code> and a target dialect:</p>
+<pre><code>json2sql convert user.json --dialect postgres --flatten -o user.sql
+</code></pre>
+<p>Instead of dumping the address into a JSON column, json2sql creates a normalized <code>address</code> table and references it from the parent <code>user</code> table via a foreign key (<code>address_id</code>). The result is queryable, indexable, and joins cleanly with the rest of your schema.</p>
+
+<h2>Turn JSON arrays into multiple INSERT rows</h2>
+<p>Arrays of objects map naturally to relational rows. Given a payload with an <code>orders</code> array:</p>
+<pre><code>// order.json
+{
+  "id": 1,
+  "customer": "Ada Lovelace",
+  "orders": [
+    { "sku": "A-101", "qty": 2, "price": 19.99 },
+    { "sku": "B-204", "qty": 1, "price": 8.50 }
+  ]
+}
+</code></pre>
+<p>json2sql emits one <code>INSERT</code> per array element into the child <code>orders</code> table, each linked back to its parent record:</p>
+<pre><code>json2sql convert order.json --dialect sqlite --flatten -o orders.sql
+sqlite3 test.db &lt; orders.sql
+</code></pre>
+
+<h2>Pick your dialect</h2>
+<p>json2sql emits correct INSERT syntax for three major engines, so the same nested JSON produces portable SQL:</p>
+<pre><code>json2sql convert data.json --dialect postgres   # PostgreSQL
+json2sql convert data.json --dialect mysql      # MySQL
+json2sql convert data.json --dialect sqlite     # SQLite
+</code></pre>
+<table>
+<thead><tr><th>Dialect</th><th>Use it for</th></tr></thead>
+<tbody>
+<tr><td><code>postgres</code></td><td>Production analytics warehouses, Supabase, and any Postgres-backed app.</td></tr>
+<tr><td><code>mysql</code></td><td>Legacy LAMP stacks and MySQL-hosted services.</td></tr>
+<tr><td><code>sqlite</code></td><td>Local test databases, CI seed data, and embedded apps.</td></tr>
+</tbody>
+</table>
+
+<h2>Use it in a pipeline</h2>
+<p>json2sql reads from stdin, so it drops into any shell or CI step. Generate seed data for integration tests, or transform a JSON export into INSERTs for a new system:</p>
+<pre><code># Pipe JSON straight into SQL
+cat fixtures.json | json2sql convert --dialect postgres --table events --flatten &gt; events.sql
+
+# GitHub Actions: prepare test data before running migrations
+json2sql convert fixtures.json --dialect sqlite -o seed.sql
+sqlite3 test.db &lt; seed.sql
+</code></pre>
+
+<h2>Why flatten instead of storing JSON blobs?</h2>
+<p>Storing nested JSON in a single column keeps the write simple but punishes every read: you can't index a nested field, joins become string-parsing exercises, and aggregations need a JSON-aware query engine. Flattening at conversion time — exactly what the <code>--flatten</code> flag does — moves the complexity to a one-off step and leaves you with boring, fast, queryable relational tables. json2sql's type inference auto-detects strings, numbers, booleans, and nulls, so the generated columns come out with sensible types rather than everything landing as <code>TEXT</code>.</p>
+
+<h2>Pricing</h2>
+<p>json2sql is one of eleven CLI tools in the Revenue Holdings suite. One license covers all of them.</p>
+<table>
+<thead><tr><th>Plan</th><th>Price</th><th>Best for</th></tr></thead>
+<tbody>
+<tr><td>Free</td><td>$0</td><td>Individual devs, OSS — CLI only, limited rows per conversion.</td></tr>
+<tr><td>json2sql Individual</td><td>$9/mo ($7 billed annually)</td><td>Professional devs — unlimited rows, batch processing, schema generation.</td></tr>
+<tr><td>Suite (all 11 CLI tools)</td><td>$49/mo ($39 billed annually)</td><td>Full Revenue Holdings toolkit — about 40% savings.</td></tr>
+<tr><td>Team</td><td>$79/mo ($63 billed annually)</td><td>Up to 5 devs — API access, CI/CD integration, priority support.</td></tr>
+<tr><td>Enterprise</td><td>Custom</td><td>SSO, RBAC, compliance reports, dedicated support.</td></tr>
+</tbody>
+</table>
+<p>The free tier runs fully offline with no row cap that blocks evaluation on small datasets — install it and flatten your first nested JSON today.</p>
+
+<p><a href="https://github.com/Coding-Dev-Tools/json2sql">View json2sql on GitHub &rarr;</a></p>
+</body>
+</html>

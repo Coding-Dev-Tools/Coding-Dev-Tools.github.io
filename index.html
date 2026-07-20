@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/">
+  <title>DevForge — Developer CLI Tools by Coding Dev Tools</title>
+  <meta name="description" content="Open-source CLI tools for API contracts, SQL, infrastructure, config drift, and more. Built by Coding Dev Tools.">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --green: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: white;
+    }
+    .brand { font-size: 20px; font-weight: 700; }
+    .brand span { color: var(--accent-light); }
+    .hero {
+      text-align: center;
+      padding: 80px 24px 48px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 .highlight { color: var(--accent-light); }
+    .hero p {
+      font-size: 20px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .cta {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 12px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+    .cta:hover { background: var(--accent-light); }
+    .tools {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    .tools h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.2s;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+    }
+    .card:hover { border-color: var(--accent); }
+    .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .card p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+    .card .tag {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--green);
+      background: rgba(16,185,129,0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    footer a { color: var(--accent-light); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">D</div>
+    <div class="brand">Dev<span>Forge</span></div>
+  </header>
+
+  <section class="hero">
+    <h1>CLI tools that <span class="highlight">just work</span></h1>
+    <p>12 open-source developer utilities for API contracts, SQL conversion, infrastructure diffs, config drift detection, and more. MIT licensed.</p>
+    <a class="cta" href="https://github.com/Coding-Dev-Tools">Explore on GitHub</a>
+  </section>
+
+  <section class="tools">
+    <h2>The Toolkit</h2>
+    <div class="grid">
+      <a class="card" href="/devforge-tools/">
+        <h3>DevForge Suite</h3>
+        <p>Install all ten DevForge CLI tools with one command — one consistent interface for API contracts, SQL, infra diffs, config drift, and more.</p>
+        <span class="tag">Suite</span>
+      </a>
+      <a class="card" href="/devforge/">
+        <h3>DevForge — the suite</h3>
+        <p>The Revenue Holdings CLI suite: config drift, API mocking, schema translation, env secrets, infra diffs, and more. One license covers all tools.</p>
+        <span class="tag">Suite</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/api-contract-guardian">
+        <h3>API Contract Guardian</h3>
+        <p>Catch breaking OpenAPI/REST API changes in CI before they reach production.</p>
+        <span class="tag">CI/CD</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/json2sql">
+        <h3>json2sql</h3>
+        <p>Convert JSON arrays and objects to SQL INSERT statements from the command line.</p>
+        <span class="tag">Data</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/deploydiff">
+        <h3>DeployDiff</h3>
+        <p>Preview infrastructure cost and configuration changes before deploying.</p>
+        <span class="tag">Infra</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/configdrift">
+        <h3>ConfigDrift</h3>
+        <p>Detect configuration drift across environments before it causes incidents.</p>
+        <span class="tag">Infra</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/schemaforge">
+        <h3>SchemaForge</h3>
+        <p>Bidirectional ORM schema conversion across 11 formats — SQLAlchemy, Django, Prisma, and more.</p>
+        <span class="tag">Schema</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/apighost">
+        <h3>APIGhost</h3>
+        <p>Mock API server generated from OpenAPI specs for local development and testing.</p>
+        <span class="tag">Testing</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/click-to-mcp">
+        <h3>click-to-mcp</h3>
+        <p>Wrap any Click or Typer CLI as an MCP server for AI agent integration.</p>
+        <span class="tag">AI/MCP</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/crossrepo-dep-manager">
+        <h3>CrossRepo Dep Manager</h3>
+        <p>Scan, detect conflicts, and normalize versions across Python repositories.</p>
+        <span class="tag">Tooling</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/datamorph">
+        <h3>DataMorph</h3>
+        <p>Convert between CSV, JSON, YAML, Parquet, Avro, and Protobuf data formats.</p>
+        <span class="tag">Data</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/envault">
+        <h3>Envault</h3>
+        <p>Sync, rotate, and manage .env files across environments securely.</p>
+        <span class="tag">Security</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/agent-os">
+        <h3>Agent OS</h3>
+        <p>Cross-agent continuity system: shared state, session coordination, and autonomous runtime.</p>
+        <span class="tag">Agent Runtime</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/vscode-schemaforge">
+        <h3>VS Code SchemaForge</h3>
+        <p>Live schema preview, quick convert, diff, and format detection in VS Code.</p>
+        <span class="tag">Editor</span>
+      </a>
+      <a class="card" href="https://github.com/Coding-Dev-Tools/agent-os">
+        <h3>Agent OS</h3>
+        <p>Cross-agent continuity system: shared state, session coordination, and autonomous runtime.</p>
+        <span class="tag">Agent Runtime</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="tools" style="padding-top:0">
+    <h2>Guides & Comparisons</h2>
+    <div class="grid">
+      <a class="card" href="/how-to-rotate-api-keys-in-ci.html">
+        <h3>Rotate API Keys in CI</h3>
+        <p>Step-by-step guide to rotating API keys safely in CI without leaking secrets.</p>
+        <span class="tag">APIAuth</span>
+      </a>
+      <a class="card" href="/apiauth-vs-other-secret-tools.html">
+        <h3>APIAuth vs Other Secret Tools</h3>
+        <p>Honest comparison of API key management alternatives — git-secret, sops, Vault, direnv.</p>
+        <span class="tag">APIAuth</span>
+      </a>
+      <a class="card" href="/openapi-mock-server-comparison.html">
+        <h3>OpenAPI Mock Server Comparison</h3>
+        <p>Honest side-by-side of APIGhost vs Prism, WireMock, and Mockoon for mock APIs.</p>
+        <span class="tag">APIGhost</span>
+      </a>
+      <a class="card" href="/prisma-to-drizzle-migration.html">
+        <h3>Prisma to Drizzle Migration</h3>
+        <p>How to migrate ORM schemas from Prisma to Drizzle without hand-editing SQL.</p>
+        <span class="tag">SchemaForge</span>
+      </a>
+      <a class="card" href="/sql-to-graphql-schema-generator.html">
+        <h3>SQL to GraphQL Schema Generator</h3>
+        <p>Convert SQL DDL to GraphQL SDL automatically — types, enums, and scalars in one command.</p>
+        <span class="tag">SchemaForge</span>
+      </a>
+      <a class="card" href="/how-to-stop-env-leaking-into-git.html">
+        <h3>Stop .env Files from Leaking into Git</h3>
+        <p>Four steps to prevent .env commits and clean up existing secret leaks in git history.</p>
+        <span class="tag">Envault</span>
+      </a>
+      <a class="card" href="/blog/envault-scan-prevent-env-leaks-in-git.html">
+        <h3>Catch Secret Leaks Before You Commit</h3>
+        <p>Wire rh-envault scan into a pre-commit hook to block leaked API keys and passwords before they hit git history.</p>
+        <span class="tag">Envault</span>
+      </a>
+      <a class="card" href="/saas-churn-prediction-with-stripe.html">
+        <h3>SaaS Churn Prediction from Stripe</h3>
+        <p>Nightly risk scores, voluntary vs involuntary churn paths, and an intervention pipeline that tracks saves.</p>
+        <span class="tag">Retention</span>
+      </a>
+      <a class="card" href="/click-to-mcp.html">
+        <h3>Click to MCP</h3>
+        <p>Wrap any Click or Typer CLI as an MCP server for AI agents. Zero boilerplate, stdio or HTTP+SSE transport.</p>
+        <span class="tag">AI/MCP</span>
+      </a>
+      <a class="card" href="/blog/datamorph-schema-validation-in-ci.html">
+        <h3>Validate Data Schemas in CI</h3>
+        <p>Catch malformed CSV, JSON, Parquet, and Avro files before they reach production. DataMorph's validate command with strict mode, exit codes, and batch pipeline integration.</p>
+        <span class="tag">DataMorph</span>
+      </a>
+      <a class="card" href="/blog/json2sql-nested-json-to-relational-sql.html">
+        <h3>Flatten Nested JSON into SQL Tables</h3>
+        <p>Turn objects, arrays, and deeply composed JSON into normalized SQL INSERT statements. json2sql's --flatten mode auto-creates relational tables for PostgreSQL, MySQL, and SQLite.</p>
+        <span class="tag">json2sql</span>
+      </a>
+      <a class="card" href="/monitor-service-health-cli.html">
+        <h3>Monitor Service Health from the Terminal</h3>
+        <p>Run structured health checks across local services with profitmax-pro — decorator-based registry and LLM suggestions.</p>
+        <span class="tag">Profitmax</span>
+      </a>
+      <a class="card" href="/track-revenue-locally-no-saas.html">
+        <h3>Track Revenue Locally</h3>
+        <p>Single HTML file + Chart.js dashboard for product and subsidiary revenue. No backend, no account.</p>
+        <span class="tag">Revenue</span>
+      </a>
+      <a class="card" href="/apighost-mock-api-for-integration-tests.html">
+        <h3>Mock Any API for Integration Tests</h3>
+        <p>APIGhost turns your OpenAPI spec into a mock server with VCR recording, scenario switching, and GitHub Actions support — no fixtures to maintain.</p>
+        <span class="tag">API tooling</span>
+      </a>
+      <a class="card" href="/apighost-getting-started.html">
+        <h3>Getting Started with APIGhost</h3>
+        <p>Install, serve a spec, record interactions for CI, and replay them deterministically. The shortest path from spec to green tests.</p>
+        <span class="tag">API tooling</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 <a href="https://github.com/Coding-Dev-Tools">Coding Dev Tools</a> &mdash; MIT License</p>
+  </footer>
+</body>
+</html>
+
+<!-- build trigger -->

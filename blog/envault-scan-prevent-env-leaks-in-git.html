@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stop committing secrets: catch .env leaks before git with a pre-commit scan</title>
+<meta name="description" content="A .env file in a commit is a breach that lives forever in git history. Use rh-envault scan — git-secrets-style commit-hook scanning — to block leaked API keys and passwords before they ever reach the remote.">
+</head>
+<body>
+<h1>Stop committing secrets: catch <code>.env</code> leaks before git with a pre-commit scan</h1>
+<p>The worst part about leaking a secret in a commit isn't the moment it happens — it's that the value is now frozen in your git history. You can delete the file, rewrite history, and force-push, but clones, forks, and CI caches already have it. The only reliable defense is to never let it leave your machine. That's what a commit-hook scan is for.</p>
+<p>Envault ships <code>rh-envault scan</code>, a git-secrets-style scanner that runs as a pre-commit hook and blocks commits containing leaked API keys, passwords, and tokens. It runs locally on the free tier, has no telemetry, and the installed command is <code>rh-envault</code>. Here's how to wire it up.</p>
+
+<h2>Install</h2>
+<pre><code># from source (not on public PyPI)
+pip install git+https://github.com/Coding-Dev-Tools/envault.git
+</code></pre>
+<p>Python 3.10+. MIT licensed.</p>
+
+<h2>Scan your working tree before you commit</h2>
+<p>The core command scans staged and unstaged files for secrets:</p>
+<pre><code># scan the current project for leaked secrets
+rh-envault scan
+
+# scan and fail the process (non-zero exit) if anything is found
+rh-envault scan --fail-on-found
+</code></pre>
+<p><code>--fail-on-found</code> is the mode you want in automation: it exits non-zero when a secret is detected, so whatever wraps it (a hook, a CI step, a pre-push check) stops the leak.</p>
+
+<h2>Wire it into a pre-commit hook</h2>
+<p>Add a hook so every commit is scanned before it's written. Create <code>.git/hooks/pre-commit</code>:</p>
+<pre><code>#!/bin/sh
+# block commits that contain leaked secrets
+rh-envault scan --fail-on-found
+</code></pre>
+<p>Make it executable (<code>chmod +x .git/hooks/pre-commit</code>), and the next time you stage a file containing an AWS key or a Stripe secret, the commit is refused with the finding printed. You fix it, unstage, and recommit — the bad value never reaches the remote.</p>
+<p>Envault also has a hook system (pre-sync / post-sync scripts), so if you'd rather manage the hook through <code>rh-envault</code> itself, the scan step slots into the same lifecycle as your env sync and rotation.</p>
+
+<h2>Catch drift between your .env and the vault</h2>
+<p>Scanning for secrets is one half. The other is knowing when a real value is sitting in a plaintext <code>.env</code> instead of the encrypted vault. <code>rh-envault diff</code> reports drift between your <code>.env</code> and the AES-256-GCM encrypted vault at <code>~/.envault/vault.enc</code>:</p>
+<pre><code># show what's in .env that isn't in the vault (or vice versa)
+rh-envault diff
+
+# block a commit when .env has values the vault doesn't
+rh-envault diff --fail-on different-secrets
+</code></pre>
+<p>Used together, <code>scan</code> (block leaked literals) and <code>diff</code> (block plaintext drift) give you two independent tripwires on every commit.</p>
+
+<h2>Run the same check in CI</h2>
+<p>A local hook is great until someone <code>--no-verify</code>s their way past it. Mirror the scan in CI so a pushed secret still gets caught:</p>
+<pre><code># .github/workflows/secret-scan.yml (excerpt)
+- name: Scan for leaked secrets
+  run: rh-envault scan --fail-on-found
+- name: Check .env drift
+  run: rh-envault diff --fail-on different-secrets
+</code></pre>
+
+<h2>What it costs</h2>
+<p>The <code>scan</code> and <code>diff</code> commands are free and unlimited on the local CLI — no account, no telemetry. Secret-store integrations (AWS SSM, HashiCorp Vault, Doppler, 1Password Connect), unlimited audit history, team shared configs, and compliance exports unlock at paid tiers: Individual $12/mo, the 11-tool Suite $49/mo, Team $79/mo. Enterprise is custom.</p>
+
+<h2>Get started</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/envault.git
+rh-envault init my-project
+rh-envault scan --fail-on-found
+</code></pre>
+<p>MIT. No telemetry. No account required for the free tier.</p>
+<ul>
+  <li><a href="https://github.com/Coding-Dev-Tools/envault">GitHub — Coding-Dev-Tools/envault</a></li>
+  <li><a href="/how-to-stop-env-leaking-into-git.html">Stop .env files from leaking into Git</a> — the cleanup companion post (removing secrets already in history)</li>
+  <li><a href="/blog/envault-secret-rotation-workflow.html">Rotate secrets across dev, staging, and prod with Envault</a></li>
+  <li><a href="/blog/envault-team-env-file-sync.html">Sync .env files across a dev team without a cloud account</a></li>
+</ul>
+</body>
+</html>

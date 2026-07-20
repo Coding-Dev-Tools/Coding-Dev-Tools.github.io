@@ -1,0 +1,22 @@
+# 2026-06-15
+
+Continue the senior-dev-rotation work for this project. No full narrative here, just a pointer back to the local state/log file and the key command(s) to resume from.
+
+## Local continuity file
+
+- Edit path: `C:/Users/jomie/workspace/Coding-Dev-Tools.github.io/_cowork_ops/ongoing/authoring/doc-dev-logs/2026-06-15__Coding-Dev-Tools.github.io__senior-dev-session-local-continuity.txt`
+- This is the canonical operator-facing local state/log line for this run.
+
+## Key command(s)
+
+- View open PRs: `gh pr list --repo Coding-Dev-Tools/Coding-Dev-Tools.github.io --state open`
+- View a specific PR: `gh pr view 1 --repo Coding-Dev-Tools/Coding-Dev-Tools.github.io`
+- Show changed files for a PR number: `gh pr view 1 --repo Coding-Dev-Tools/Coding-Dev-Tools.github.io --json files --jq '.files[].path'`
+- Fetch a PR file: `gh pr view 1 --repo Coding-Dev-Tools/Coding-Dev-Tools.github.io --json files --jq '.files[] | select(.path=="<path>")'`
+- View the diff: `gh pr diff 1 --repo Coding-Dev-Tools/Coding-Dev-Tools.github.io`
+- Branch / remote check: `git status --short --branch && git remote -v`
+- Workspace tree probe: `ls -la`
+
+## Resume rule
+
+Only pick up `Coding-Dev-Tools.github.io` after all 3 open PRs from the invariant set have been closed or merged.
