@@ -23,6 +23,11 @@
 <h1>Blog</h1>
 <p class="subtitle">Guides, comparisons, and field notes for the toolkit.</p>
 <div class="grid">
+  <a class="post" href="/blog/deadcode-find-unused-exports-typescript.html">
+    <h2>Find and remove dead code in TypeScript &amp; React</h2>
+    <p>Detect unused exports, dead Next.js routes, orphaned CSS, and unreferenced components — then preview every deletion before it writes a byte.</p>
+    <span class="tag">DeadCode</span>
+  </a>
   <a class="post" href="/blog/apighost-openapi-mock-server.html">
     <h2>Turn any OpenAPI spec into a working mock server</h2>
     <p>Mock API server generated from OpenAPI specs with VCR recording and scenario switching.</p>
@@ -38,14 +43,24 @@
     <p>Session-scoped pytest fixtures, deterministic VCR cassettes, and scenario switching for error-path tests. Zero external dependencies in CI.</p>
     <span class="tag">APIGhost</span>
   </a>
-  <a class="post" href="/blog/apiauth-api-key-management-in-ci.html">
-    <h2>Rotate API keys in CI without leaking them</h2>
-    <p>Local CLI for generating, rotating, and auditing API keys. No hosted service required.</p>
-    <span class="tag">APIAuth</span>
+  <a class="post" href="/blog/apighost-vcr-record-replay-pytest.html">
+    <h2>VCR Recording for pytest: Record HTTP Requests and Replay Them Offline</h2>
+    <p>Record real HTTP interactions once, save them to a cassette file, and replay them as deterministic mocks in every test run — no live network required.</p>
+    <span class="tag">APIGhost</span>
   </a>
-  <a class="post" href="/blog/schemaforge-11-format-schema-translator.html">
+  <a class="post" href="/blog/apiauth-api-key-management-in-ci.html">
+      <h2>Rotate API keys in CI without leaking them</h2>
+      <p>Local CLI for generating, rotating, and auditing API keys. No hosted service required.</p>
+      <span class="tag">APIAuth</span>
+    </a>
+    <a class="post" href="/blog/apiauth-fastapi-api-key-management.html">
+      <h2>API Key Management in FastAPI with APIAuth</h2>
+      <p>Secure API key generation, verification, and rotation for FastAPI apps using APIAuth's encrypted local keystore.</p>
+      <span class="tag">APIAuth</span>
+    </a>
+    <a class="post" href="/blog/schemaforge-11-format-schema-translator.html">
     <h2>SchemaForge — 11-format schema translator</h2>
-    <p>Convert between SQL DDL, Prisma, Drizzle, TypeORM, and more with zero-loss roundtripping.</p>
+    <p>Convert across 11 schema formats / 100 documented directions. Review foreign-key and ORM relationship details after conversion.</p>
     <span class="tag">SchemaForge</span>
   </a>
   <a class="post" href="/blog/schemaforge-json-schema-to-prisma.html">
@@ -56,6 +71,11 @@
   <a class="post" href="/blog/typeorm-to-prisma-migration.html">
     <h2>Migrate TypeORM entities to Prisma schema automatically</h2>
     <p>One command converts TypeORM entity classes to a Prisma schema — columns, types, indexes, and enums handled. No hand-editing required.</p>
+    <span class="tag">SchemaForge</span>
+  </a>
+  <a class="post" href="/blog/django-models-to-prisma-migration.html">
+    <h2>Migrate Django models to Prisma schema automatically</h2>
+    <p>One command converts Django ORM model classes to a Prisma schema — field types, choices-based enums, indexes, and server defaults handled. Relations need a manual step.</p>
     <span class="tag">SchemaForge</span>
   </a>
   <a class="post" href="/blog/sqlalchemy-to-prisma-migration.html">
@@ -83,20 +103,35 @@
     <p>Four workflows to prevent .env commits, catch missing keys before they land, and rotate secrets without touching a text editor.</p>
     <span class="tag">Envault</span>
   </a>
-  <a class="post" href="/blog/configdrift-detect-config-drift-across-environments.html">
-    <h2>Detect configuration drift across environments with ConfigDrift</h2>
-    <p>Catch config drift before it causes a production outage. Compare entire environment directories, block breaking drift in CI, and audit env parity — all from one CLI command.</p>
-    <span class="tag">ConfigDrift</span>
-  </a>
-  <a class="post" href="/blog/datamorph-convert-csv-to-parquet.html">
-    <h2>Convert CSV to Parquet from the command line with DataMorph</h2>
-    <p>Stream files over 10GB between CSV, JSON, Parquet, YAML, Avro, and more — with schema inference and CI-friendly validation. No pandas, no OOM.</p>
-    <span class="tag">DataMorph</span>
+  <a class="post" href="/blog/api-contract-guardian-breaking-changes-ci.html">
+    <h2>Detect breaking API changes in CI with API Contract Guardian</h2>
+    <p>Catch breaking OpenAPI changes before merge — diff specs between branches, generate migration guides, and block CI pipelines on contract violations.</p>
+    <span class="tag">API Contract Guardian</span>
   </a>
   <a class="post" href="/blog/saas-churn-prediction-with-stripe.html">
     <h2>Predict SaaS churn from Stripe data</h2>
     <p>Score every customer 0–100 nightly. Separate voluntary from involuntary churn, then intervene with an auditable pipeline.</p>
     <span class="tag">SaaS Churn Predictor</span>
+  </a>
+  <a class="post" href="/blog/envault-team-env-file-sync.html">
+    <h2>Sync .env Files Across a Dev Team Without a Cloud Account</h2>
+    <p>Keep dev, staging, and prod .env files consistent across your team using rh-envault — no account, no cloud, no secrets in Slack.</p>
+    <span class="tag">Envault</span>
+  </a>
+  <a class="post" href="/blog/envault-secret-rotation-workflow.html">
+    <h2>Rotate secrets across dev, staging, and prod with Envault</h2>
+    <p>One command rotates a password, API key, or JWT and rolls it out to every environment — smart type inference, audit trail, no SaaS required.</p>
+    <span class="tag">Envault</span>
+  </a>
+  <a class="post" href="/blog/datamorph-schema-validation-in-ci.html">
+    <h2>Validate data file schemas in CI with DataMorph</h2>
+    <p>Catch malformed CSV, JSON, Parquet, and Avro files before they reach production. Schema inference, strict validation, exit-code gating, and batch mode — no hosted service required.</p>
+    <span class="tag">DataMorph</span>
+  </a>
+  <a class="post" href="/blog/deploydiff-preview-infra-changes.html">
+    <h2>Preview infrastructure changes: Terraform, CloudFormation, Pulumi</h2>
+    <p>See what changes, estimate cost impact, and generate rollback commands — all from one CLI. Terraform, CloudFormation, and Pulumi supported.</p>
+    <span class="tag">DeployDiff</span>
   </a>
 </div>
 </body>

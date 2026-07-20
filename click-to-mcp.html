@@ -134,7 +134,7 @@
       {
         "@type": "HowToStep",
         "name": "Install click-to-mcp",
-        "text": "pip install click-to-mcp"
+        "text": "pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git"
       },
       {
         "@type": "HowToStep",
@@ -193,7 +193,7 @@
 
     <p>If you have a Python CLI built with Click or Typer, you can expose it to AI agents in a single step. No boilerplate, no manual JSON schema, no keep-in-sync headache.</p>
 
-    <pre><code>pip install click-to-mcp
+    <pre><code>pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git
 click-to-mcp serve your-cli-name</code></pre>
 
     <p>That is it. Your CLI is now an MCP server. Claude Code, Cursor, and VS Code can call every command and option as native MCP tools.</p>
@@ -225,7 +225,7 @@ click-to-mcp serve your-cli-name</code></pre>
       <span class="step-number">2</span>
       <strong>HTTP+SSE</strong>
       <p style="margin-top:8px">Best for web-based MCP clients. Requires the <code>http</code> extra.</p>
-      <code>pip install "click-to-mcp[http]"</code>
+      <code>pip install "click-to-mcp[http] @ git+https://github.com/Coding-Dev-Tools/click-to-mcp.git"</code>
       <code>click-to-mcp serve-http your-cli --port 8000</code>
     </div>
 

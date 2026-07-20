@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ConfigDrift — Detect config drift across environments before incidents</title>
+  <meta name="description" content="ConfigDrift compares configs across environments, flags drift, and blocks CI on compliance violations. Free CLI, Python 3.10+, MIT. Install via git+ (not on public PyPI).">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/configdrift.html">
+  <meta property="og:title" content="ConfigDrift — Detect config drift across environments before incidents">
+  <meta property="og:description" content="Compare configs, flag drift, and exit non-zero on breaking changes so CI can block the PR. Free, MIT, Python 3.10+.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ConfigDrift",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Cross-platform",
+    "license": "https://opensource.org/licenses/MIT",
+    "url": "https://github.com/Coding-Dev-Tools/configdrift"
+  }
+  </script>
+  <style>
+    :root { --bg:#0d1117; --surface:#161b22; --border:#30363d; --text:#e6edf3; --muted:#8b949e; --accent:#6366f1; --accent-light:#818cf8; --green:#10b981; --amber:#d29922; --red:#f85149; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; min-height:100vh; }
+    a { color:var(--accent-light); }
+    header { border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; gap:12px; }
+    .logo { width:32px; height:32px; background:var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; color:white; }
+    .brand { font-size:20px; font-weight:700; text-decoration:none; color:var(--text); }
+    .brand span { color:var(--accent-light); }
+    main { max-width:860px; margin:0 auto; padding:56px 24px 80px; }
+    h1 { font-size:36px; font-weight:800; line-height:1.15; margin-bottom:16px; }
+    h1 .highlight { color:var(--accent-light); }
+    .lede { font-size:19px; color:var(--muted); margin-bottom:12px; }
+    h2 { font-size:24px; font-weight:700; margin:44px 0 14px; }
+    h3 { font-size:18px; font-weight:600; margin:28px 0 8px; }
+    p { margin-bottom:16px; }
+    ul, ol { margin:0 0 16px 22px; }
+    li { margin-bottom:6px; }
+    .updated { font-size:13px; color:var(--muted); margin-bottom:28px; }
+    .callout { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:8px; padding:16px 20px; margin:8px 0 20px; }
+    .callout strong { color:var(--text); }
+    .warn { border-left-color:var(--amber); }
+    table { border-collapse:collapse; width:100%; margin:16px 0 8px; font-size:14px; }
+    th, td { border:1px solid var(--border); padding:10px 12px; text-align:left; vertical-align:top; }
+    th { background:var(--surface); font-weight:600; }
+    pre { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; overflow-x:auto; font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace; font-size:13.5px; line-height:1.5; margin:4px 0 20px; }
+    code { font-family:inherit; font-size:0.9em; background:var(--surface); padding:1px 5px; border-radius:4px; }
+    .install-box { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--green); border-radius:8px; padding:16px 20px; font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace; font-size:14px; margin:8px 0 16px; overflow-x:auto; }
+    .cta { margin-top:48px; background:var(--surface); border:1px solid var(--border); border-top:3px solid var(--accent); border-radius:8px; padding:28px 32px; text-align:center; }
+    .cta h2 { margin:0 0 10px; font-size:22px; }
+    .cta p { color:var(--muted); margin-bottom:18px; }
+    .btn { display:inline-block; background:var(--accent); color:white; font-weight:700; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:15px; }
+    .btn:hover { background:var(--accent-light); color:white; }
+    footer { border-top:1px solid var(--border); padding:24px; text-align:center; font-size:13px; color:var(--muted); }
+    footer a { color:var(--muted); }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">C</div>
+  <a class="brand" href="/">Coding<span>Dev</span>Tools</a>
+</header>
+<main>
+  <h1>ConfigDrift: <span class="highlight">catch config drift</span> before it causes incidents</h1>
+  <p class="lede">Keep staging and prod consistent. ConfigDrift compares config files and environment directories, flags drift, and exits non-zero on breaking changes so CI can block the PR before it ships.</p>
+  <p class="updated">Last updated: 2026-07-17 · <a href="https://github.com/Coding-Dev-Tools/configdrift">ConfigDrift on GitHub</a></p>
+
+  <div class="callout warn"><strong>Not on public PyPI.</strong> ConfigDrift is distributed via a direct GitHub install or the self-hosted index (see Install). There is no <code>pip install configdrift</code> on public PyPI.</div>
+
+  <h2>Install</h2>
+  <div class="install-box">pip install git+https://github.com/Coding-Dev-Tools/configdrift.git</div>
+  <p class="updated">One license covers all 11 DevForge CLI tools. The free CLI works fully offline — no telemetry, no phone-home.</p>
+
+  <h2>Why config drift matters</h2>
+  <p>Configuration drift — when staging and production quietly diverge — is a leading cause of "works on my machine" incidents. ConfigDrift turns drift detection into a routine, automatable check:</p>
+  <ul>
+    <li><strong>Multi-environment compliance</strong> — ensure staging and prod configs are identical before every deploy.</li>
+    <li><strong>Secrets audit</strong> — detect env vars that exist in one environment but are missing in another.</li>
+    <li><strong>CI/CD gating</strong> — block PRs that introduce config drift across environments.</li>
+    <li><strong>Incident prevention</strong> — catch a changed database endpoint before it causes a production outage.</li>
+  </ul>
+
+  <h2>Quick start</h2>
+  <p>Compare two config files:</p>
+  <pre>configdrift check dev.yaml prod.yaml</pre>
+  <p>Scan entire directories as environments:</p>
+  <pre>configdrift scan ./config/dev ./config/staging ./config/prod</pre>
+  <p>Generate a config file that defines your environments:</p>
+  <pre>configdrift init
+configdrift scan --config .configdrift.yaml</pre>
+
+  <h2>Commands</h2>
+  <h3><code>check</code> — compare config files</h3>
+  <pre>configdrift check &lt;file1&gt; &lt;file2&gt; [--output table|json|silent] [--baseline dev] [--target prod]</pre>
+  <ul>
+    <li><code>table</code> (default) — rich colored table output.</li>
+    <li><code>json</code> — machine-readable JSON for CI integration.</li>
+    <li><code>silent</code> — exit code only (0 = no breaking drift, 1 = breaking drift found).</li>
+  </ul>
+  <h3><code>scan</code> — compare environment directories</h3>
+  <pre>configdrift scan ./dev ./staging ./prod --baseline dev</pre>
+  <p>Scans all config files in each directory, merges them, and compares against a baseline environment.</p>
+  <h3><code>init</code> — generate a config file</h3>
+  <pre>configdrift init .</pre>
+  <p>Creates <code>.configdrift.yaml</code> in the specified directory.</p>
+
+  <h2>CI/CD gating</h2>
+  <p>Use <code>--output silent</code> so a breaking drift fails the build:</p>
+  <pre>configdrift check dev.yaml prod.yaml --output silent || echo "Drift detected!"</pre>
+  <p>GitHub Actions:</p>
+  <pre> - name: Detect config drift
+   run: |
+     pip install git+https://github.com/Coding-Dev-Tools/configdrift.git
+     configdrift check ./config/staging/app.yaml ./config/prod/app.yaml --output silent</pre>
+
+  <h2>Supported formats</h2>
+  <table>
+    <tr><th>Format</th><th>Extension</th><th>Notes</th></tr>
+    <tr><td>YAML</td><td><code>.yaml</code>, <code>.yml</code></td><td>Full nested structure support</td></tr>
+    <tr><td>JSON</td><td><code>.json</code></td><td>Nested flattening</td></tr>
+    <tr><td>TOML</td><td><code>.toml</code></td><td>Python 3.11+ native</td></tr>
+    <tr><td>.env</td><td><code>.env</code></td><td><code>KEY=VALUE</code> format</td></tr>
+  </table>
+
+  <h2>Severity levels</h2>
+  <ul>
+    <li><strong>Info</strong> — non-critical value changes.</li>
+    <li><strong>Warning</strong> — added or removed optional keys.</li>
+    <li><strong>Breaking</strong> — changes to critical keys: <code>database*</code>, <code>auth*</code>, <code>api_key*</code>, <code>secret*</code>, <code>password*</code>, <code>token*</code>, <code>endpoint*</code>.</li>
+  </ul>
+
+  <h2>Pricing</h2>
+  <p>ConfigDrift is part of the DevForge / Revenue Holdings suite. One license covers all 11 CLI tools.</p>
+  <table>
+    <tr><th>Plan</th><th>Price</th><th>Best for</th></tr>
+    <tr><td><strong>Free</strong></td><td>$0</td><td>Individual devs, OSS — CLI only, 1 env pair</td></tr>
+    <tr><td>ConfigDrift Individual</td><td><strong>$15/mo</strong> ($12 billed annually)</td><td>Professional devs — unlimited environments, custom rules</td></tr>
+    <tr><td>Suite (all 11 tools)</td><td><strong>$49/mo</strong> ($39 billed annually)</td><td>Full Revenue Holdings toolkit — 40% savings</td></tr>
+    <tr><td>Team</td><td><strong>$79/mo</strong> ($63 billed annually)</td><td>Up to 5 devs — drift history, Slack alerts, priority support</td></tr>
+    <tr><td>Enterprise</td><td>Custom</td><td>SSO, RBAC, compliance reports, dedicated support</td></tr>
+  </table>
+  <p>No lock-in: the CLI works fully offline on the free tier — no telemetry, no phone-home. Annual billing saves 20%.</p>
+
+  <h2>FAQ</h2>
+  <h3>Is ConfigDrift on public PyPI?</h3>
+  <p>No. Install via <code>git+https://github.com/Coding-Dev-Tools/configdrift.git</code> (or the self-hosted index once published). There is no public <code>pip install configdrift</code>.</p>
+  <h3>Which config formats are supported?</h3>
+  <p>YAML, JSON, TOML (Python 3.11+), and <code>.env</code> (<code>KEY=VALUE</code>).</p>
+  <h3>Can I gate CI on drift?</h3>
+  <p>Yes. Run <code>configdrift check a.yaml b.yaml --output silent</code>; it exits 1 on breaking drift so the pipeline fails before merge.</p>
+
+  <div class="cta">
+    <h2>Start catching drift today</h2>
+    <p>Free, open-source, MIT. One command to install.</p>
+    <a class="btn" href="https://github.com/Coding-Dev-Tools/configdrift">View ConfigDrift on GitHub</a>
+  </div>
+</main>
+<footer>
+  <p>Part of the <a href="https://github.com/Coding-Dev-Tools">Coding Dev Tools</a> suite · <a href="/">More guides</a> · <a href="https://revenueholdings.dev">Revenue Holdings</a> · <a href="/devforge-tools/">DevForge suite</a> · <a href="/blog/deploydiff-preview-infra-changes.html">DeployDiff</a> · <a href="/how-to-stop-env-leaking-into-git.html">Envault</a></p>
+</footer>
+</body>
+</html>

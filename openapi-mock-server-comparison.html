@@ -143,12 +143,13 @@
     <h2>APIGhost</h2>
     <p>APIGhost is a Python CLI that turns an OpenAPI 3.0/3.1 spec into a running mock server in one command, populates it with Faker-powered fake data keyed off property names, and adds two things most spec-driven mocks don't bundle: VCR-style record/replay cassettes for deterministic test runs, and named scenario presets for exercising edge cases like error responses.</p>
     <pre><code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git
-# or, install straight from source:
-# pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+# or via Homebrew (macOS/Linux):
+# brew tap Coding-Dev-Tools/homebrew-tap && brew install apighost
 apighost serve petstore.yaml          # mock from a spec
 apighost serve spec.yaml --scenario error
 apighost record petstore.yaml          # capture a deterministic cassette
 apighost replay my-recording           # replay it forever</code></pre>
+    <p class="note">APIGhost is not on public PyPI and its self-hosted index is currently unavailable. The <code>git+</code> command above is the documented working pip install path. Homebrew is also a verified install option on macOS and Linux.</p>
     <p>Best fit: Python-centric teams who want spec-driven mocking <em>and</em> deterministic replay <em>and</em> scenario switching from a single <code>pip install</code>, without bringing in a Node toolchain or the JVM. Free for local/dev use; a Pro tier ($12/mo) adds unlimited requests, VCR cassettes, and CI/CD integration. <a href="https://github.com/Coding-Dev-Tools/apighost">Repo &amp; docs &rarr;</a></p>
 
     <h2>Stoplight Prism</h2>

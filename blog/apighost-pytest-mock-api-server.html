@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mock a REST API in pytest without a backend | APIGhost</title>
-<meta name="description" content="Use APIGhost to spin up a local mock API server inside pytest. Deterministic fixtures, scenario switching, and zero external dependencies in CI.">
+<meta name="description" content="Use APIGhost to spin up a local mock API server inside pytest. Deterministic cassette replay and scenario switching for integration tests.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "headline": "Mock a REST API in pytest without a backend",
-  "description": "Use APIGhost to spin up a local mock API server inside pytest. Deterministic fixtures, scenario switching, and zero external dependencies in CI.",
+  "description": "Use APIGhost to spin up a local mock API server inside pytest. Deterministic cassette replay and scenario switching for integration tests.",
   "author": {"@type": "Organization", "name": "Coding Dev Tools"},
   "keywords": ["pytest mock api", "python mock rest api", "apighost pytest", "mock api server python", "integration test mock server"],
   "about": {
@@ -39,10 +39,8 @@
 
 <h2>Install</h2>
 
-<pre><code># via the self-hosted index (recommended)
-pip install git+https://github.com/Coding-Dev-Tools/apighost.git
-
-# or directly from source
+<pre><code># Documented pip install path (APIGhost is not on public PyPI;
+# its self-hosted index is currently unavailable)
 pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 
 # macOS Homebrew
@@ -176,7 +174,7 @@ def test_client_handles_500_gracefully(mock_api_error):
 
 <h2>Pricing</h2>
 
-<p>The Free tier covers local and dev use — the fixture above runs entirely free. <strong>Pro ($12/mo or $119/yr)</strong> unlocks unlimited concurrent requests, multi-cassette management, and CI-mode flags for parallelised test runs. Suite ($49/mo) bundles all Coding-Dev-Tools products under one license.</p>
+<p>The Free tier covers local and dev use — the fixture above runs entirely free. <strong>Pro ($12/mo or $119/yr)</strong> includes unlimited requests, VCR cassettes, and CI/CD integration. Suite ($49/mo) bundles all Coding-Dev-Tools products under one license.</p>
 
 <h2>What about <code>responses</code>, <code>httpretty</code>, or <code>pytest-httpserver</code>?</h2>
 
@@ -184,7 +182,7 @@ def test_client_handles_500_gracefully(mock_api_error):
 
 <footer>
 <p>Repo: <a href="https://github.com/Coding-Dev-Tools/apighost">github.com/Coding-Dev-Tools/apighost</a>
-&mdash; <a href="/blog/apighost-getting-started.html">Getting-started guide</a>
+&mdash; <a href="/apighost-getting-started.html">Getting-started guide</a>
 &mdash; <a href="/blog/apighost-openapi-mock-server.html">OpenAPI mock server overview</a></p>
 </footer>
 </body>

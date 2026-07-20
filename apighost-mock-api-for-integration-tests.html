@@ -275,11 +275,11 @@ test("GET /users returns array", async () => {
   <p><strong>vs Mockoon:</strong> Mockoon requires a GUI to configure routes. APIGhost is headless — suitable for CI environments with no display.</p>
 
   <div class="callout">
-    <p><strong>Note on install:</strong> APIGhost is not yet published to public PyPI. Install via the git URL above or from the <a href="https://github.com/Coding-Dev-Tools/apighost" style="color:#818cf8">GitHub repo</a>: <code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git</code></p>
+    <p><strong>Note on install:</strong> APIGhost is not yet published to public PyPI. Install straight from source: <code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git</code>. Homebrew instructions are in the <a href="https://github.com/Coding-Dev-Tools/apighost" style="color:#818cf8">APIGhost README</a>.</p>
   </div>
 
   <h2>Pricing</h2>
-  <p>Local and dev use is free with no account required. The Pro tier unlocks unlimited requests and removes the session cap, which matters in CI where a single run can exceed the Free limit quickly:</p>
+  <p>Local and dev use is free. The Pro tier unlocks unlimited requests and removes the session cap, which matters in CI where a single run can exceed the Free limit quickly:</p>
   <div class="pricing">
     <div class="price-card">
       <h4>Free</h4>
@@ -314,7 +314,7 @@ test("GET /users returns array", async () => {
 
   <div class="cta-block">
     <h2>Try APIGhost in your next test run</h2>
-    <p style="color:#8b949e;margin-top:12px">One command to install. One command to start a mock server from your spec. No account required for local use.</p>
+    <p style="color:#8b949e;margin-top:12px">One command to install. One command to start a mock server from your spec.</p>
     <div class="install-box" style="display:block;text-align:left;margin:20px auto;max-width:600px">pip install git+https://github.com/Coding-Dev-Tools/apighost.git</div>
     <a class="cta-btn" href="https://github.com/Coding-Dev-Tools/apighost">View on GitHub →</a>
     <p style="color:#8b949e;font-size:13px;margin-top:16px">MIT license · Python 3.10+ · <a href="/openapi-mock-server-comparison.html" style="color:#818cf8">Compare with Prism, WireMock, Mockoon</a></p>

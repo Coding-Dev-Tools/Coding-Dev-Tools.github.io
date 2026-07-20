@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview infrastructure changes before deploy: Terraform, CloudFormation, Pulumi | Revenue Holdings</title>
+<meta name="description" content="Preview Terraform plan, CloudFormation changeset, and Pulumi diff with DeployDiff — see what changes, estimate costs, and generate rollback commands before you deploy. Multi-provider CLI, free tier, no telemetry.">
+</head>
+<body>
+<h1>Preview infrastructure changes before deploy</h1>
+<p>Every infrastructure change carries risk: a Terraform plan that deletes a production load balancer, a CloudFormation changeset that replaces a database, a Pulumi preview buried in CI output. You need a tool that reads those plan files and tells you, in plain language, what changed, what it costs, and how to undo it — without switching CLI contexts or learning yet another DSL.</p>
+<p><strong>DeployDiff</strong> reads Terraform plan JSON, CloudFormation change sets, and Pulumi preview files from a single CLI. It shows a human-readable diff, estimates the monthly cost impact, and generates rollback commands — all before you hit deploy.</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
+</code></pre>
+<p>DeployDiff is not published on public PyPI (publishing is pending). It is MIT-licensed, Python 3.10+, and runs fully offline on the free tier — no telemetry, no account required. If you use Homebrew or Scoop, both are also available: <code>brew tap Coding-Dev-Tools/tap &amp;&amp; brew install deploydiff</code> or <code>scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket &amp;&amp; scoop install deploydiff</code>.</p>
+
+<h2>Preview what a plan changes</h2>
+<p>Point DeployDiff at any Terraform plan JSON, CloudFormation change set, or Pulumi preview file. It parses the provider-specific format and renders a unified summary of creates, updates, deletes, and replaces.</p>
+<pre><code>deploydiff preview --tf plan.json
+deploydiff preview --cfn changeset.json
+deploydiff preview --pulumi preview.json
+deploydiff preview --tf plan.json -v        # verbose: before/after per property
+deploydiff preview --tf plan.json --exit-on-destroy  # exit 1 if destructive
+</code></pre>
+<p>The <code>-v</code> flag shows property-level diffs: exactly what changed, from what value to what new value. Destructive actions (deletes and replaces) are highlighted so they stand out in terminal output. The <code>--exit-on-destroy</code> flag lets you gate a CI pipeline — exit 1 if the plan would destroy or replace any resource.</p>
+
+<h2>Estimate cost impact</h2>
+<p>DeployDiff reads cost metadata from the plan file and estimates the monthly change. You can supply custom pricing data for resources the provider does not include.</p>
+<pre><code>deploydiff cost --tf plan.json
+deploydiff cost --cfn changeset.json
+deploydiff cost --tf plan.json --pricing custom-pricing.json
+</code></pre>
+<p>The output shows per-resource before/after costs and a total monthly delta. No separate API call, no per-resource pricing lookup — just a summary row that tells you whether this change is cheap or expensive.</p>
+
+<h2>Generate rollback commands</h2>
+<p>When a deploy goes wrong, the first instinct is to undo it fast — but panic-mode command construction is how mistakes compound. DeployDiff reads a plan and writes the correct rollback commands for your provider.</p>
+<pre><code>deploydiff rollback --tf plan.json
+deploydiff rollback --cfn changeset.json
+</code></pre>
+<p>The output is provider-specific: Terraform <code>terraform apply -target=...</code> commands, CloudFormation stack rollback, etc. Copy, paste, recover — no manual command construction.</p>
+
+<h2>Use cases</h2>
+<table>
+<thead><tr><th>Scenario</th><th>What DeployDiff gives you</th></tr></thead>
+<tbody>
+<tr><td>CI pipeline gate</td><td><code>deploydiff preview --tf plan.json --exit-on-destroy</code> fails a PR that would delete production resources</td></tr>
+<tr><td>Multi-provider team</td><td>One CLI for Terraform, CloudFormation, and Pulumi — no context-switching</td></tr>
+<tr><td>Cost-conscious deploy</td><td><code>deploydiff cost</code> shows the monthly delta before anyone hits "merge"</td></tr>
+<tr><td>Incident recovery</td><td><code>deploydiff rollback</code> generates correct undo commands in seconds</td></tr>
+<tr><td>AI agent integration</td><td><code>deploydiff mcp</code> runs as an MCP server so Claude Code or Cursor can inspect infrastructure diffs directly</td></tr>
+</tbody>
+</table>
+
+<h2>CI/CD integration</h2>
+<p>DeployDiff blocks on no input provided, so you can pipe the output into any CI pipeline step:</p>
+<pre><code># Fail on destructive changes
+deploydiff preview --tf plan.json --exit-on-destroy
+
+# Show cost delta in deploy log
+deploydiff cost --tf plan.json
+
+# Generate and store rollback commands for rapid recovery
+deploydiff rollback --tf plan.json &gt; rollback-commands.sh
+</code></pre>
+
+<h2>Why not just read the plan JSON?</h2>
+<p>You can, but a Terraform plan JSON is hundreds of lines of nested objects. DeployDiff strips the provider-specific noise and shows what matters: resource type, action (create/update/delete/replace), changed properties, cost delta, and a recovery path. It also normalises across three providers so your team uses one tool regardless of which IaC tool each service chose.</p>
+
+<h2>Pricing</h2>
+<p>The free tier includes CLI preview, cost estimation (1 plan comparison), and rollback generation — fully offline, no telemetry, no account required. DeployDiff Individual is $15/mo ($12/mo billed annually) for unlimited stacks, multi-provider support, and cost estimation. Suite is $49/mo ($39/mo annually) for all 11 Revenue Holdings CLI tools under one license. Team is $79/mo for up to 5 devs with shared reports and Slack alerts. Enterprise pricing is custom.</p>
+
+<h2>Where to go next</h2>
+<p>DeployDiff is one of 11 tools in the Revenue Holdings suite, built by autonomous AI. Point it at your next Terraform plan, review the diff, estimate the cost, and generate a rollback — before you hit deploy.</p>
+
+<p>MIT, Python 3.10+, no telemetry.</p>
+
+<footer>
+  <p>Repo: <a href="https://github.com/Coding-Dev-Tools/deploydiff">github.com/Coding-Dev-Tools/deploydiff</a> &mdash; part of <a href="https://coding-dev-tools.github.io/devforge/">Revenue Holdings</a></p>
+</footer>
+</body>
+</html>

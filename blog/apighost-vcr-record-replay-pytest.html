@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VCR Recording for pytest: Record HTTP Requests and Replay Them Offline | APIGhost</title>
+  <meta name="description" content="Learn how to record real HTTP interactions and replay them as deterministic mocks in pytest using APIGhost's VCR cassette system. No more flaky network tests." />
+  <meta name="keywords" content="vcr cassette pytest, record http requests python, replay http requests test, mock http requests pytest, api mock vcr python, apighost vcr recording, deterministic api tests python" />
+  <link rel="canonical" href="https://coding-dev-tools.github.io/blog/apighost-vcr-record-replay-pytest.html" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="VCR Recording for pytest: Record & Replay HTTP Requests" />
+  <meta property="og:description" content="Record real HTTP interactions once, replay them offline forever — no flaky network calls in your test suite." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://coding-dev-tools.github.io/blog/apighost-vcr-record-replay-pytest.html" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e2e8f0; line-height: 1.7; }
+    a { color: #60a5fa; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 2rem 1.5rem; text-align: center; border-bottom: 1px solid #4338ca; }
+    header .logo { font-size: 1.1rem; font-weight: 700; color: #a5b4fc; letter-spacing: .05em; margin-bottom: .5rem; }
+    header nav a { color: #c7d2fe; margin: 0 .75rem; font-size: .9rem; }
+
+    .hero { max-width: 780px; margin: 3rem auto 0; padding: 0 1.5rem; }
+    .hero .tag { display: inline-block; background: #312e81; color: #a5b4fc; font-size: .75rem; font-weight: 600; padding: .25rem .75rem; border-radius: 9999px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1rem; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; line-height: 1.2; color: #f8fafc; margin-bottom: 1rem; }
+    .hero .subtitle { font-size: 1.1rem; color: #94a3b8; margin-bottom: 1.5rem; }
+    .meta { font-size: .85rem; color: #64748b; }
+
+    main { max-width: 780px; margin: 2.5rem auto 4rem; padding: 0 1.5rem; }
+
+    h2 { font-size: 1.45rem; font-weight: 700; color: #f1f5f9; margin: 2.5rem 0 .75rem; padding-top: .5rem; border-top: 1px solid #1e293b; }
+    h3 { font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin: 1.75rem 0 .5rem; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; color: #cbd5e1; }
+    li { margin-bottom: .4rem; }
+
+    pre { background: #0d1117; border: 1px solid #1e293b; border-radius: .5rem; padding: 1.25rem 1.5rem; overflow-x: auto; margin: 1.25rem 0; font-size: .88rem; line-height: 1.6; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace; }
+    p code, li code { background: #1e293b; color: #7dd3fc; padding: .15rem .4rem; border-radius: .25rem; font-size: .85em; }
+
+    .callout { background: #0f2040; border-left: 4px solid #3b82f6; border-radius: 0 .5rem .5rem 0; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+    .callout.warn { background: #1c1300; border-color: #f59e0b; }
+    .callout p { margin: 0; color: #bfdbfe; }
+    .callout.warn p { color: #fde68a; }
+
+    table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: .9rem; }
+    th { background: #1e293b; color: #94a3b8; text-align: left; padding: .6rem .9rem; font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+    td { padding: .6rem .9rem; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+    .pricing-card { background: #131a2b; border: 1px solid #1e293b; border-radius: .75rem; padding: 1.25rem; }
+    .pricing-card.highlight { border-color: #6366f1; }
+    .pricing-card .tier { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #6366f1; margin-bottom: .4rem; }
+    .pricing-card .price { font-size: 1.6rem; font-weight: 800; color: #f8fafc; margin-bottom: .3rem; }
+    .pricing-card .period { font-size: .8rem; color: #64748b; }
+    .pricing-card ul { margin: .75rem 0 0; padding-left: 1.1rem; font-size: .85rem; color: #94a3b8; }
+
+    .cta-box { background: linear-gradient(135deg, #1e1b4b, #312e81); border: 1px solid #4338ca; border-radius: .75rem; padding: 1.75rem; margin: 2.5rem 0 1.5rem; text-align: center; }
+    .cta-box p { color: #c7d2fe; margin-bottom: 1rem; }
+    .cta-btn { display: inline-block; background: #6366f1; color: #fff; font-weight: 700; padding: .65rem 1.75rem; border-radius: .5rem; font-size: .95rem; }
+    .cta-btn:hover { background: #4f46e5; text-decoration: none; }
+
+    footer { text-align: center; padding: 2rem 1rem; color: #475569; font-size: .8rem; border-top: 1px solid #1e293b; }
+    footer a { color: #64748b; }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "VCR Recording for pytest: Record HTTP Requests and Replay Them Offline",
+    "description": "How to record real HTTP interactions and replay them as deterministic mocks in pytest using APIGhost's VCR cassette system.",
+    "datePublished": "2026-07-11",
+    "author": {"@type": "Organization", "name": "Coding Dev Tools"},
+    "publisher": {"@type": "Organization", "name": "Coding Dev Tools", "url": "https://coding-dev-tools.github.io"},
+    "keywords": ["vcr cassette pytest", "record http requests python", "replay http requests test", "mock http requests pytest"],
+    "mainEntityOfPage": "https://coding-dev-tools.github.io/blog/apighost-vcr-record-replay-pytest.html"
+  }
+  </script>
+</head>
+<body>
+
+<header>
+  <div class="logo">🔧 Coding Dev Tools</div>
+  <nav>
+    <a href="https://coding-dev-tools.github.io/">Home</a>
+    <a href="https://coding-dev-tools.github.io/blog/index.html">Blog</a>
+    <a href="https://github.com/Coding-Dev-Tools/apighost">GitHub</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <span class="tag">Testing · API Mocking</span>
+  <h1>VCR Recording for pytest: Record HTTP Requests and Replay Them Offline</h1>
+  <p class="subtitle">Flaky tests caused by real network calls? Record interactions, then replay them through a local mock server.</p>
+  <p class="meta">July 11, 2026 · APIGhost · 8 min read</p>
+</div>
+
+<main>
+
+  <p>Network calls in tests are the number-one source of non-determinism: rate limits, timeouts, slow CI runners, and API downtime all make otherwise-correct tests fail randomly. The VCR (Video Cassette Recorder) pattern solves this: you record a real HTTP interaction once, save it to a "cassette" file, and replay that file in every subsequent test run — no live network required.</p>
+
+  <p>This guide walks through the VCR cassette workflow in <a href="https://github.com/Coding-Dev-Tools/apighost">APIGhost</a> — an open-source mock server for OpenAPI specs that has first-class VCR recording built in alongside spec-driven faking.</p>
+
+  <h2>Why VCR cassettes instead of patching?</h2>
+
+  <p>The traditional Python approach to mocking HTTP is <code>unittest.mock.patch</code> or the <code>responses</code> library. Both work, but they require you to handcraft response bodies — which drift from reality as APIs evolve and are tedious to maintain for deeply nested JSON payloads.</p>
+
+  <table>
+    <thead>
+      <tr><th>Approach</th><th>Pros</th><th>Cons</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>unittest.mock.patch</code></td><td>No dependencies, familiar</td><td>Manual JSON; drifts from real API silently</td></tr>
+      <tr><td><code>responses</code> library</td><td>URL-pattern matching</td><td>Still hand-authored bodies; no serialisation to disk</td></tr>
+      <tr><td><code>vcrpy</code></td><td>Real recordings</td><td>Coupled to underlying HTTP lib; cassettes can be large/noisy</td></tr>
+      <tr><td>APIGhost VCR</td><td>Recorded interactions; integrates with the APIGhost mock server</td><td>Requires a running APIGhost process</td></tr>
+    </tbody>
+  </table>
+
+  <p>APIGhost's README documents VCR recording and deterministic replay alongside spec-driven mock-server generation. Choose the workflow that fits your test suite, then review recorded data before committing it.</p>
+
+  <h2>Installation</h2>
+
+  <p>APIGhost is MIT-licensed. Its README documents a source install and a Homebrew installation path:</p>
+
+  <pre><code># pip — documented source install
+pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+
+# Homebrew (macOS / Linux)
+brew tap Coding-Dev-Tools/homebrew-tap
+brew install apighost</code></pre>
+
+  <p>Verify the install:</p>
+
+  <pre><code>apighost --version</code></pre>
+
+  <div class="callout">
+    <p><strong>Note:</strong> <code>pip install apighost</code> (bare, no <code>--index-url</code>) will fail — the package is not on public PyPI. Use one of the commands above.</p>
+  </div>
+
+  <h2>The record → replay workflow</h2>
+
+  <p>There are three steps:</p>
+
+  <ol>
+    <li><strong>Record</strong> — use APIGhost's record command to save interactions to a cassette.</li>
+    <li><strong>Commit</strong> the cassette alongside your test code.</li>
+    <li><strong>Replay</strong> — in CI (or locally), start APIGhost in replay mode; it serves the saved cassette without touching the network.</li>
+  </ol>
+
+  <h3>Step 1 — Record a cassette</h3>
+
+  <p>Point APIGhost at an OpenAPI spec and write the recorded output to a cassette path:</p>
+
+  <pre><code>apighost record petstore.yaml --output fixtures/petstore-cassette.json</code></pre>
+
+  <p>Use only non-sensitive test data when recording. Before committing any cassette, inspect its contents and remove credentials or personal data.</p>
+
+  <h3>Step 2 — Inspect and commit the cassette</h3>
+
+  <p>Open <code>fixtures/petstore-cassette.json</code> to review what was captured before committing it. A cassette entry looks like:</p>
+
+  <pre><code>{
+  "id": "get_pets_001",
+  "request": {
+    "method": "GET",
+    "path": "/v1/pets",
+    "headers": {"Accept": "application/json"}
+  },
+  "response": {
+    "status": 200,
+    "headers": {"Content-Type": "application/json"},
+    "body": [
+      {"id": 1, "name": "Noodle", "tag": "cat"},
+      {"id": 2, "name": "Biscuit"}
+    ]
+  },
+  "schema_operation": "GET /v1/pets",
+  "recorded_at": "2026-07-11T08:12:33Z"
+}</code></pre>
+
+  <p>Scrub any credentials or personal data from the cassette before committing it:</p>
+
+  <pre><code>git add fixtures/petstore-cassette.json
+git commit -m "test: add petstore VCR cassette"</code></pre>
+
+  <h3>Step 3 — Replay in pytest</h3>
+
+  <p>Start APIGhost in replay mode as a pytest fixture so it boots before your tests and shuts down after:</p>
+
+  <pre><code># conftest.py
+import subprocess
+import time
+import pytest
+
+@pytest.fixture(scope="session", autouse=True)
+def apighost_replay():
+    """Start APIGhost in VCR replay mode for the test session."""
+    proc = subprocess.Popen(
+        [
+            "apighost", "replay", "fixtures/petstore-cassette.json",
+            "-p", "4000",
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    time.sleep(1)  # brief wait for server to bind
+    yield proc
+    proc.terminate()
+    proc.wait()</code></pre>
+
+  <p>Now point your test HTTP client at <code>http://localhost:4000</code> — no live network is touched:</p>
+
+  <pre><code># test_pets_api.py
+import httpx
+
+BASE = "http://localhost:4000"
+
+def test_list_pets():
+    r = httpx.get(f"{BASE}/v1/pets")
+    assert r.status_code == 200
+    data = r.json()
+    assert isinstance(data, list)
+    assert data[0]["name"] == "Noodle"   # matches our cassette
+
+def test_get_single_pet():
+    r = httpx.get(f"{BASE}/v1/pets/42")
+    assert r.status_code == 200
+    pet = r.json()
+    assert "id" in pet
+
+def test_create_pet():
+    r = httpx.post(f"{BASE}/v1/pets", json={"name": "Pretzel", "tag": "dog"})
+    assert r.status_code == 201</code></pre>
+
+  <p>Run the suite:</p>
+
+  <pre><code>pytest -v
+# ===== 3 passed in 0.4s =====</code></pre>
+
+  <p>No network calls. Deterministic. Fast.</p>
+
+  <h2>Keeping cassettes fresh</h2>
+
+  <p>APIs change. Here's a low-friction refresh workflow:</p>
+
+  <ol>
+    <li>Delete (or rename) the stale cassette file.</li>
+    <li>Re-run the record step against the live API.</li>
+    <li>Review the diff with <code>git diff fixtures/petstore-cassette.json</code>.</li>
+    <li>Update assertions in your tests that depended on changed fields.</li>
+    <li>Commit the new cassette.</li>
+  </ol>
+
+  <p>Reviewing cassette diffs alongside test changes helps make recorded behavior explicit before you update a suite.</p>
+
+  <h2>CI integration (GitHub Actions example)</h2>
+
+  <pre><code># .github/workflows/test.yml (excerpt)
+steps:
+  - uses: actions/checkout@v4
+
+  - name: Set up Python
+    uses: actions/setup-python@v5
+    with: {python-version: "3.12"}
+
+  - name: Install dependencies
+    run: |
+      pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+      pip install httpx pytest
+
+  - name: Run tests (VCR replay — no live network)
+    run: pytest -v
+    # apighost replay starts automatically via conftest.py fixture</code></pre>
+
+  <p>No secrets needed, no external API calls, no flakiness from rate limits.</p>
+
+  <div class="callout warn">
+    <p><strong>Honesty note:</strong> cassettes record real response data. Never commit cassettes that contain production PII or credentials. Review the cassette file before <code>git add</code>.</p>
+  </div>
+
+  <h2>Pricing</h2>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="tier">Free</div>
+      <div class="price">$0</div>
+      <div class="period">local / dev use</div>
+      <ul>
+        <li>Unlimited local use</li>
+        <li>100 requests/session</li>
+      </ul>
+    </div>
+    <div class="pricing-card highlight">
+      <div class="tier">Pro</div>
+      <div class="price">$12<span style="font-size:.9rem;font-weight:400;">/mo</span></div>
+      <div class="period">$119/yr</div>
+      <ul>
+        <li>Everything in Free</li>
+        <li>Unlimited requests</li>
+        <li>VCR cassettes</li>
+        <li>CI/CD integration</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Suite</div>
+      <div class="price">$49<span style="font-size:.9rem;font-weight:400;">/mo</span></div>
+      <div class="period">discount when billed annually</div>
+      <ul>
+        <li>All Coding-Dev-Tools tools under one license</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>Check the README for current feature and plan details before choosing a tier; the documented Free plan includes unlimited local use with a 100-request session limit.</p>
+
+  <div class="cta-box">
+    <p><strong>Ready to eliminate flaky network tests?</strong> APIGhost is free to install and use locally.</p>
+    <a class="cta-btn" href="https://github.com/Coding-Dev-Tools/apighost">View APIGhost on GitHub →</a>
+  </div>
+
+  <h2>Related guides</h2>
+
+  <ul>
+    <li><a href="https://coding-dev-tools.github.io/blog/apighost-pytest-mock-api-server.html">Using APIGhost as a pytest mock API server</a> — spec-driven faking without cassettes</li>
+    <li><a href="https://coding-dev-tools.github.io/blog/apighost-openapi-mock-server.html">OpenAPI mock server quickstart</a></li>
+    <li><a href="https://coding-dev-tools.github.io/blog/apighost-getting-started.html">APIGhost getting started guide</a></li>
+  </ul>
+
+  <hr style="border:none;border-top:1px solid #1e293b;margin:2.5rem 0 1.5rem;" />
+
+  <p style="font-size:.85rem;color:#64748b;"><em>APIGhost is MIT-licensed open-source software. Claims about features and pricing are sourced from the <a href="https://github.com/Coding-Dev-Tools/apighost">official README</a> (verified 2026-07-19). This site is maintained by the Coding Dev Tools team.</em></p>
+
+</main>
+
+<footer>
+  <p>© 2026 Coding Dev Tools · <a href="https://coding-dev-tools.github.io/">Home</a> · <a href="https://github.com/Coding-Dev-Tools">GitHub</a> · <a href="https://coding-dev-tools.github.io/blog/index.html">Blog</a></p>
+</footer>
+
+</body>
+</html>

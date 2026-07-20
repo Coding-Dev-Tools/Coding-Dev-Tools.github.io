@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sync .env Files Across a Dev Team Without a Cloud Account | Revenue Holdings</title>
+<meta name="description" content="How to keep dev, staging, and prod .env files consistent across a team using rh-envault — no account, no cloud, no leaked secrets in Slack.">
+<link rel="canonical" href="https://revenueholdings.dev/blog/envault-team-env-file-sync.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Sync .env Files Across a Dev Team Without a Cloud Account",
+  "description": "How to keep dev, staging, and prod .env files consistent across a team using rh-envault — no account, no cloud, no leaked secrets in Slack.",
+  "author": {"@type": "Organization", "name": "Revenue Holdings"},
+  "datePublished": "2026-07-11",
+  "keywords": ["env file sync", "team environment variables", "dotenv team", "secret management cli", "rh-envault"]
+}
+</script>
+</head>
+<body>
+<h1>Sync .env Files Across a Dev Team Without a Cloud Account</h1>
+
+<p>Every team has the same problem. Someone joins the project, asks for the <code>.env</code> file, and gets it over Slack or email. Months later a key changes and half the team is on the old one. Staging works. Local doesn't. Nobody knows why.</p>
+
+<p>The standard solutions are either "share a .env in a secret Notion page" (risky) or "pay for a secrets manager and reconfigure your entire deploy pipeline" (overkill for a five-person team). <a href="https://github.com/Coding-Dev-Tools/envault">Envault</a> is the middle path: a CLI that keeps your .env files in sync, with an audit trail, no cloud account required, MIT license.</p>
+
+<h2>Install</h2>
+
+<pre><code># via git (recommended — not on public PyPI)
+pip install git+https://github.com/Coding-Dev-Tools/envault.git
+
+# via self-hosted index
+pip install git+https://github.com/Coding-Dev-Tools/envault.git
+
+# Homebrew
+brew install coding-dev-tools/tap/rh-envault</code></pre>
+
+<p>Python 3.10+. MIT. No telemetry. No account.</p>
+
+<pre><code>rh-envault --version</code></pre>
+
+<h2>How team sync actually works</h2>
+
+<p>Envault treats each environment — dev, staging, prod — as a named profile in a <code>.envault.yml</code> config that lives in your repo (with secrets excluded via <code>.gitignore</code>, naturally):</p>
+
+<pre><code>rh-envault init my-project</code></pre>
+
+<p>This creates <code>.envault.yml</code> with your project ID and empty environment stubs. Commit it. Every developer clones the repo and runs the same pull to get the current state:</p>
+
+<pre><code>rh-envault pull dev</code></pre>
+
+<p>No Slack DMs. No shared Google Doc. No "which version did you copy?" The team pulls the same named snapshot.</p>
+
+<h2>Catch drift before it reaches staging</h2>
+
+<p>The most common breakage pattern: dev adds a new env key, forgets to add it to staging, deploy fails at runtime. Envault's diff command surfaces this in CI before the PR merges:</p>
+
+<pre><code>rh-envault diff dev staging --fail-on-missing</code></pre>
+
+<p>Exit code is non-zero if staging is missing keys that dev expects. Wire this into your CI step and the PR gate catches it automatically — no post-deploy debugging.</p>
+
+<h2>Promote config from staging to prod</h2>
+
+<p>When staging is blessed and you're ready to promote:</p>
+
+<pre><code>rh-envault sync staging prod</code></pre>
+
+<p>This copies config values but leaves prod-specific secrets (like the production DB password) in place. It's not a flat overwrite — Envault knows the difference between config and credentials.</p>
+
+<h2>Onboard a new developer in 30 seconds</h2>
+
+<p>New team member, Day 1:</p>
+
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/envault.git
+git clone <your-repo>
+cd <your-repo>
+rh-envault pull dev</code></pre>
+
+<p>That's it. The <code>.envault.yml</code> is already in the repo. The pull fetches their local dev environment. No scavenger hunt through past Slack threads.</p>
+
+<h2>Audit who changed what</h2>
+
+<p>When a key rotates unexpectedly or a deploy breaks, the first question is "who changed this?" Envault logs every diff, sync, and rotate operation:</p>
+
+<pre><code>rh-envault audit</code></pre>
+
+<p>The output is queryable from the CLI. You get timestamps, changed keys, and the operation type — enough to reconstruct what happened without grepping git blame across a dozen commits.</p>
+
+<h2>Hook into secret stores for production</h2>
+
+<p>For production secrets you don't want in any file at all — even an encrypted one — Envault integrates with the stores your team may already have:</p>
+
+<pre><code># AWS SSM Parameter Store
+pip install "git+https://github.com/Coding-Dev-Tools/envault.git#egg=rh-envault[awsssm]"
+
+# HashiCorp Vault
+pip install "git+https://github.com/Coding-Dev-Tools/envault.git#egg=rh-envault[vault]"
+
+# Doppler
+pip install "git+https://github.com/Coding-Dev-Tools/envault.git#egg=rh-envault[doppler]"
+
+# 1Password
+pip install "git+https://github.com/Coding-Dev-Tools/envault.git#egg=rh-envault[onepassword]"</code></pre>
+
+<p>The CLI then pulls from the store directly instead of from a local file. Dev stays on local files; prod uses the store. No bespoke glue code per environment.</p>
+
+<h2>What the free tier covers</h2>
+
+<p>The diff/sync/pull/audit loop is free, offline, and unlimited for personal use. No rate limits on local operations.</p>
+
+<p>Secret store integrations, unlimited team shared configs, compliance reports, the audit dashboard, and the REST API for CI sidecars unlock at paid tiers:</p>
+
+<table>
+<thead><tr><th>Tier</th><th>Monthly</th><th>What you get</th></tr></thead>
+<tbody>
+<tr><td>Free</td><td>$0</td><td>CLI, diff/sync/rotate/audit, local only, rate-limited</td></tr>
+<tr><td>Individual</td><td>$12/mo ($10/mo annual)</td><td>Unlimited syncs, all secret-store integrations, full audit history</td></tr>
+<tr><td>Suite</td><td>$49/mo</td><td>All 11 devforge tools</td></tr>
+<tr><td>Team</td><td>$79/mo</td><td>Team configs, shared audit dashboard, compliance exports</td></tr>
+</tbody>
+</table>
+
+<h2>What this doesn't replace</h2>
+
+<p>Envault isn't a secrets manager in the HashiCorp or AWS Secrets Manager sense. It doesn't rotate database credentials automatically or handle secret versioning with per-service access policies. If you have a 50-person security team and SOC 2 requirements, you need the full managed tier or a dedicated secrets manager. If you have a 5–15 person dev team that keeps losing .env files and breaking each other's local setups, Envault is what fixes that.</p>
+
+<h2>Get started</h2>
+
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/envault.git
+rh-envault init my-project
+rh-envault pull dev</code></pre>
+
+<p>MIT. No telemetry. No account required for the free tier.</p>
+
+<ul>
+  <li><a href="https://github.com/Coding-Dev-Tools/envault">GitHub — Coding-Dev-Tools/envault</a></li>
+  <li><a href="/blog/stop-env-leaks-and-broken-env-parity-in-ci.html">How to stop .env leaks and broken CI parity</a> — the companion post for CI workflows</li>
+</ul>
+
+<p><em>Disclosure: I built Envault, so take the recommendation accordingly. The workflows above are the same ones I use in my own projects.</em></p>
+</body>
+</html>

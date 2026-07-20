@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <base href="/">
   <title>Prisma to Drizzle ORM migration — SchemaForge</title>
-  <meta name="description" content="Convert Prisma schemas to Drizzle ORM in one command with SchemaForge. Supports 11 formats, zero-loss roundtripping, and the VS Code extension.">
+  <meta name="description" content="Convert Prisma schemas to Drizzle ORM with SchemaForge. It supports 11 formats and 100 documented conversion directions; review foreign-key and ORM relationship details after conversion.">
   <link rel="canonical" href="https://coding-dev-tools.github.io/prisma-to-drizzle-migration.html">
   <script type="application/ld+json">
   {
@@ -108,7 +108,7 @@
 
   <main>
     <h1>Migrate Prisma to Drizzle ORM in one command</h1>
-    <p>SchemaForge is an open-source ORM schema converter. It converts between 11 formats, including Prisma and Drizzle, with zero-loss roundtripping.</p>
+    <p>SchemaForge is an open-source ORM schema converter. It supports 11 formats and 100 documented conversion directions, including Prisma to Drizzle. Review foreign-key constraints and ORM relationship fields after conversion: the shared representation does not retain them.</p>
 
     <p>
       <a class="cta" href="https://github.com/Coding-Dev-Tools/schemaforge">View on GitHub</a>
@@ -122,13 +122,13 @@ schemaforge convert --from prisma --to drizzle --input schema.prisma</pre>
 
     <h2>What you get</h2>
     <ul>
-      <li>Drizzle schema output with the same table/column/relation definitions from your Prisma file.</li>
-      <li>Preserved types, enums, and defaults where the formats overlap.</li>
-      <li>Same IR guarantees other conversions benefit from: zero-loss roundtrips, configurable type maps, and a <code>diff</code> command for schema drift.</li>
+      <li>Drizzle schema output with tables, columns, types, defaults, indexes, unique constraints, and enums preserved by the shared representation.</li>
+      <li>Foreign-key constraints and ORM relationship fields require review after conversion because they are not retained by the shared representation.</li>
+      <li>Configurable type maps and a <code>diff</code> command for schema drift.</li>
     </ul>
 
     <h2>11 formats, one tool</h2>
-    <p>Prisma and Drizzle are two endpoints in the same converter. SchemaForge also handles SQL DDL, TypeORM, Django, SQLAlchemy, Alembic, JSON Schema, GraphQL SDL, EF Core (C#), and Scala case classes.</p>
+    <p>Prisma and Drizzle are two endpoints in the same converter. SchemaForge also handles SQL DDL, TypeORM, Django, SQLAlchemy, Alembic, JSON Schema, GraphQL SDL, EF Core (C#), and Scala case classes. Alembic is output-only, so it can be generated but not parsed back into the shared representation.</p>
 
     <h2>SchemaForge at a glance</h2>
     <table>
@@ -150,38 +150,6 @@ schemaforge convert --from prisma --to drizzle --input schema.prisma</pre>
       <tr><td>EF Core (C#)</td><td>✓</td><td>✓</td><td>✓</td></tr>
       <tr><td>Scala case class</td><td>✓</td><td>✓</td><td>✓</td></tr>
     </table>
-
-    <h2>Pricing</h2>
-    <table>
-      <tr>
-        <th>Plan</th>
-        <th>Price</th>
-        <th>Best for</th>
-      </tr>
-      <tr>
-        <td>Free</td>
-        <td>$0</td>
-        <td>CLI only, individual/OSS use, rate-limited batch</td>
-      </tr>
-      <tr>
-        <td>Individual</td>
-        <td>$15/mo ($12/yr)</td>
-        <td>Unlimited conversions, batch mode, custom type maps</td>
-      </tr>
-      <tr>
-        <td>Suite (all 11 tools)</td>
-        <td>$49/mo ($39/yr)</td>
-        <td>Full Revenue Holdings toolkit</td>
-      </tr>
-      <tr>
-        <td>Team</td>
-        <td>$79/mo ($63/yr)</td>
-        <td>Up to 5 devs, shared schemas, dashboard</td>
-      </tr>
-    </table>
-
-    <h2>Paid features used by this flow</h2>
-    <p>This guide assumes Individual tier or higher. The free tier supports CLI conversions, but batch mode and some advanced integrations like the VS Code extension and MCP server are better served by paid plans.</p>
 
     <h2>Useful next reads</h2>
     <ul>
