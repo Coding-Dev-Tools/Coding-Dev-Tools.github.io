@@ -67,10 +67,12 @@
   <p class="lede">Keep staging and prod consistent. ConfigDrift compares config files and environment directories, flags drift, and exits non-zero on breaking changes so CI can block the PR before it ships.</p>
   <p class="updated">Last updated: 2026-07-17 · <a href="https://github.com/Coding-Dev-Tools/configdrift">ConfigDrift on GitHub</a></p>
 
-  <div class="callout warn"><strong>Not on public PyPI.</strong> ConfigDrift is distributed via a direct GitHub install or the self-hosted index (see Install). There is no <code>pip install configdrift</code> on public PyPI.</div>
+  <div class="callout warn"><strong>Not on public PyPI.</strong> ConfigDrift is distributed via a direct GitHub install, Homebrew, or Scoop (see Install). There is no <code>pip install configdrift</code> on public PyPI.</div>
 
   <h2>Install</h2>
   <div class="install-box">pip install git+https://github.com/Coding-Dev-Tools/configdrift.git</div>
+  <p>Or via Homebrew: <code>brew tap Coding-Dev-Tools/tap &amp;&amp; brew install configdrift</code></p>
+  <p>Or via Scoop: <code>scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket &amp;&amp; scoop install configdrift</code></p>
   <p class="updated">One license covers all 11 DevForge CLI tools. The free CLI works fully offline — no telemetry, no phone-home.</p>
 
   <h2>Why config drift matters</h2>
@@ -145,7 +147,7 @@ configdrift scan --config .configdrift.yaml</pre>
 
   <h2>FAQ</h2>
   <h3>Is ConfigDrift on public PyPI?</h3>
-  <p>No. Install via <code>git+https://github.com/Coding-Dev-Tools/configdrift.git</code> (or the self-hosted index once published). There is no public <code>pip install configdrift</code>.</p>
+  <p>No. Install via <code>git+https://github.com/Coding-Dev-Tools/configdrift.git</code>, Homebrew (<code>brew tap Coding-Dev-Tools/tap &amp;&amp; brew install configdrift</code>), or Scoop. There is no public <code>pip install configdrift</code>.</p>
   <h3>Which config formats are supported?</h3>
   <p>YAML, JSON, TOML (Python 3.11+), and <code>.env</code> (<code>KEY=VALUE</code>).</p>
   <h3>Can I gate CI on drift?</h3>
