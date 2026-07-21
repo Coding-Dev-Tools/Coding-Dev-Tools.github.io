@@ -41,7 +41,7 @@ datamorph validate data.csv --strict --json-output
 <tr><td>Pre-ingestion gate</td><td>Incoming CSV/Parquet from partners</td><td><code>datamorph validate incoming.csv --strict</code></td></tr>
 <tr><td>ETL pipeline test</td><td>Intermediate JSON/JSONL output</td><td><code>datamorph validate stage.jsonl --schema etl-schema.json</code></td></tr>
 <tr><td>Pre-deploy data assets</td><td>YAML/Parquet referenced by prod services</td><td><code>datamorph validate config.yaml --strict</code></td></tr>
-<tr><td>Train/test split verification</td><td>Avro/Parquet ML training data</td><td><code>datamorph batch ./train/ --to parquet --validate</code></td></tr>
+<tr><td>Train/test split verification</td><td>Avro/Parquet ML training data</td><td><code>datamorph validate ./train/data.parquet --strict</code></td></tr>
 </tbody>
 </table>
 
@@ -95,8 +95,11 @@ datamorph validate new-partner-export.csv --schema schemas/daily-export.json --s
 <li><strong>Avro</strong> — schema-embedded, common in Kafka pipelines</li>
 <li><strong>Protobuf</strong> — binary wire format with a compiled descriptor</li>
 </ul>
-<p>For batch validation across multiple files, use the <code>batch</code> command with <code>--validate</code> to check every input file before running the conversion:</p>
-<pre><code>datamorph batch ./incoming/ ./processed/ --from csv --to parquet --validate
+<p>For batch validation across multiple files, validate each file individually before running the conversion:</p>
+<pre><code># Validate all files in a directory, then batch-convert
+datamorph validate ./incoming/file1.csv --strict
+datamorph validate ./incoming/file2.csv --strict
+datamorph batch ./incoming/ ./processed/ --from csv --to parquet
 </code></pre>
 
 <h2>Pricing</h2>
