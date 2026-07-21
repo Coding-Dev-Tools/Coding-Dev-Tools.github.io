@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Convert nested JSON to relational SQL tables with json2sql | Revenue Holdings</title>
+<title>Convert nested JSON to relational SQL tables with json2sql | Coding Dev Tools</title>
 <meta name="description" content="Turn nested JSON — objects, arrays, and deeply composed structures — into normalized SQL INSERT statements. json2sql's --flatten mode auto-creates relational tables from nested data for PostgreSQL, MySQL, and SQLite. Free tier, no telemetry.">
 </head>
 <body>
@@ -79,13 +79,13 @@ sqlite3 test.db &lt; seed.sql
 <p>Storing nested JSON in a single column keeps the write simple but punishes every read: you can't index a nested field, joins become string-parsing exercises, and aggregations need a JSON-aware query engine. Flattening at conversion time — exactly what the <code>--flatten</code> flag does — moves the complexity to a one-off step and leaves you with boring, fast, queryable relational tables. json2sql's type inference auto-detects strings, numbers, booleans, and nulls, so the generated columns come out with sensible types rather than everything landing as <code>TEXT</code>.</p>
 
 <h2>Pricing</h2>
-<p>json2sql is one of eleven CLI tools in the Revenue Holdings suite. One license covers all of them.</p>
+<p>json2sql is one of eleven CLI tools in the Coding Dev Tools suite. One license covers all of them.</p>
 <table>
 <thead><tr><th>Plan</th><th>Price</th><th>Best for</th></tr></thead>
 <tbody>
 <tr><td>Free</td><td>$0</td><td>Individual devs, OSS — CLI only, limited rows per conversion.</td></tr>
 <tr><td>json2sql Individual</td><td>$9/mo ($7 billed annually)</td><td>Professional devs — unlimited rows, batch processing, schema generation.</td></tr>
-<tr><td>Suite (all 11 CLI tools)</td><td>$49/mo ($39 billed annually)</td><td>Full Revenue Holdings toolkit — about 40% savings.</td></tr>
+<tr><td>Suite (all 11 CLI tools)</td><td>$49/mo ($39 billed annually)</td><td>Full Coding Dev Tools toolkit — about 40% savings.</td></tr>
 <tr><td>Team</td><td>$79/mo ($63 billed annually)</td><td>Up to 5 devs — API access, CI/CD integration, priority support.</td></tr>
 <tr><td>Enterprise</td><td>Custom</td><td>SSO, RBAC, compliance reports, dedicated support.</td></tr>
 </tbody>
