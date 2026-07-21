@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sync .env Files Across a Dev Team Without a Cloud Account | Revenue Holdings</title>
+<title>Sync .env Files Across a Dev Team Without a Cloud Account | Coding Dev Tools</title>
 <meta name="description" content="How to keep dev, staging, and prod .env files consistent across a team using rh-envault — no account, no cloud, no leaked secrets in Slack.">
 <link rel="canonical" href="https://revenueholdings.dev/blog/envault-team-env-file-sync.html">
 <script type="application/ld+json">
@@ -12,7 +12,7 @@
   "@type": "TechArticle",
   "headline": "Sync .env Files Across a Dev Team Without a Cloud Account",
   "description": "How to keep dev, staging, and prod .env files consistent across a team using rh-envault — no account, no cloud, no leaked secrets in Slack.",
-  "author": {"@type": "Organization", "name": "Revenue Holdings"},
+  "author": {"@type": "Organization", "name": "Coding Dev Tools"},
   "datePublished": "2026-07-11",
   "keywords": ["env file sync", "team environment variables", "dotenv team", "secret management cli", "rh-envault"]
 }
@@ -28,13 +28,7 @@
 <h2>Install</h2>
 
 <pre><code># via git (recommended — not on public PyPI)
-pip install git+https://github.com/Coding-Dev-Tools/envault.git
-
-# via self-hosted index
-pip install git+https://github.com/Coding-Dev-Tools/envault.git
-
-# Homebrew
-brew install coding-dev-tools/tap/rh-envault</code></pre>
+pip install git+https://github.com/Coding-Dev-Tools/envault.git</code></pre>
 
 <p>Python 3.10+. MIT. No telemetry. No account.</p>
 
@@ -46,11 +40,11 @@ brew install coding-dev-tools/tap/rh-envault</code></pre>
 
 <pre><code>rh-envault init my-project</code></pre>
 
-<p>This creates <code>.envault.yml</code> with your project ID and empty environment stubs. Commit it. Every developer clones the repo and runs the same pull to get the current state:</p>
+<p>This creates <code>.envault.yml</code> with your project ID and empty environment stubs. Commit it. Every developer clones the repo and decrypts the shared environment file to get the current state:</p>
 
-<pre><code>rh-envault pull dev</code></pre>
+<pre><code>rh-envault decrypt .env.dev.locked</code></pre>
 
-<p>No Slack DMs. No shared Google Doc. No "which version did you copy?" The team pulls the same named snapshot.</p>
+<p>No Slack DMs. No shared Google Doc. No "which version did you copy?" The team decrypts the same committed snapshot.</p>
 
 <h2>Catch drift before it reaches staging</h2>
 
@@ -75,9 +69,9 @@ brew install coding-dev-tools/tap/rh-envault</code></pre>
 <pre><code>pip install git+https://github.com/Coding-Dev-Tools/envault.git
 git clone <your-repo>
 cd <your-repo>
-rh-envault pull dev</code></pre>
+rh-envault decrypt .env.dev.locked</code></pre>
 
-<p>That's it. The <code>.envault.yml</code> is already in the repo. The pull fetches their local dev environment. No scavenger hunt through past Slack threads.</p>
+<p>That's it. The <code>.envault.yml</code> is already in the repo. The decrypt step restores their local dev environment from the committed encrypted file. No scavenger hunt through past Slack threads.</p>
 
 <h2>Audit who changed what</h2>
 
@@ -107,7 +101,7 @@ pip install "git+https://github.com/Coding-Dev-Tools/envault.git#egg=rh-envault[
 
 <h2>What the free tier covers</h2>
 
-<p>The diff/sync/pull/audit loop is free, offline, and unlimited for personal use. No rate limits on local operations.</p>
+<p>The diff/sync/encrypt/decrypt/audit loop is free on the local CLI. The free tier is rate-limited; paid tiers remove those limits.</p>
 
 <p>Secret store integrations, unlimited team shared configs, compliance reports, the audit dashboard, and the REST API for CI sidecars unlock at paid tiers:</p>
 
@@ -129,7 +123,7 @@ pip install "git+https://github.com/Coding-Dev-Tools/envault.git#egg=rh-envault[
 
 <pre><code>pip install git+https://github.com/Coding-Dev-Tools/envault.git
 rh-envault init my-project
-rh-envault pull dev</code></pre>
+rh-envault encrypt .env.dev</code></pre>
 
 <p>MIT. No telemetry. No account required for the free tier.</p>
 

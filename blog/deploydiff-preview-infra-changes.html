@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Preview infrastructure changes before deploy: Terraform, CloudFormation, Pulumi | Revenue Holdings</title>
+<title>Preview infrastructure changes before deploy: Terraform, CloudFormation, Pulumi | Coding Dev Tools</title>
 <meta name="description" content="Preview Terraform plan, CloudFormation changeset, and Pulumi diff with DeployDiff — see what changes, estimate costs, and generate rollback commands before you deploy. Multi-provider CLI, free tier, no telemetry.">
 </head>
 <body>
@@ -69,15 +69,15 @@ deploydiff rollback --tf plan.json &gt; rollback-commands.sh
 <p>You can, but a Terraform plan JSON is hundreds of lines of nested objects. DeployDiff strips the provider-specific noise and shows what matters: resource type, action (create/update/delete/replace), changed properties, cost delta, and a recovery path. It also normalises across three providers so your team uses one tool regardless of which IaC tool each service chose.</p>
 
 <h2>Pricing</h2>
-<p>The free tier includes CLI preview, cost estimation (1 plan comparison), and rollback generation — fully offline, no telemetry, no account required. DeployDiff Individual is $15/mo ($12/mo billed annually) for unlimited stacks, multi-provider support, and cost estimation. Suite is $49/mo ($39/mo annually) for all 11 Revenue Holdings CLI tools under one license. Team is $79/mo for up to 5 devs with shared reports and Slack alerts. Enterprise pricing is custom.</p>
+<p>The free tier includes CLI preview, cost estimation (1 plan comparison), and rollback generation — fully offline, no telemetry, no account required. DeployDiff Individual is $15/mo ($12/mo billed annually) for unlimited stacks, multi-provider support, and cost estimation. Suite is $49/mo ($39/mo annually) for all 11 Coding Dev Tools CLI tools under one license. Team is $79/mo for up to 5 devs with shared reports and Slack alerts. Enterprise pricing is custom.</p>
 
 <h2>Where to go next</h2>
-<p>DeployDiff is one of 11 tools in the Revenue Holdings suite, built by autonomous AI. Point it at your next Terraform plan, review the diff, estimate the cost, and generate a rollback — before you hit deploy.</p>
+<p>DeployDiff is one of 11 tools in the Coding Dev Tools suite, built by autonomous AI. Point it at your next Terraform plan, review the diff, estimate the cost, and generate a rollback — before you hit deploy.</p>
 
 <p>MIT, Python 3.10+, no telemetry.</p>
 
 <footer>
-  <p>Repo: <a href="https://github.com/Coding-Dev-Tools/deploydiff">github.com/Coding-Dev-Tools/deploydiff</a> &mdash; part of <a href="https://coding-dev-tools.github.io/devforge/">Revenue Holdings</a></p>
+  <p>Repo: <a href="https://github.com/Coding-Dev-Tools/deploydiff">github.com/Coding-Dev-Tools/deploydiff</a> &mdash; part of <a href="https://coding-dev-tools.github.io/devforge/">Coding Dev Tools</a></p>
 </footer>
 </body>
 </html>
