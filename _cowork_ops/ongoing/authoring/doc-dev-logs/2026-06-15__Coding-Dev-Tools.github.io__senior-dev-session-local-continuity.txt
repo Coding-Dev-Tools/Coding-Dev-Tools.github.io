@@ -4,7 +4,7 @@ Continue the senior-dev-rotation work for this project. No full narrative here, 
 
 ## Local continuity file
 
-- Edit path: `C:/Users/home/workspace/Coding-Dev-Tools.github.io/_cowork_ops/ongoing/authoring/doc-dev-logs/2026-06-15__Coding-Dev-Tools.github.io__senior-dev-session-local-continuity.txt`
+- Edit path: `%USERPROFILE%/workspace/Coding-Dev-Tools.github.io/_cowork_ops/ongoing/authoring/doc-dev-logs/2026-06-15__Coding-Dev-Tools.github.io__senior-dev-session-local-continuity.txt`
 - This is the canonical operator-facing local state/log line for this run.
 
 ## Key command(s)
