@@ -16,7 +16,7 @@
     "name": "Monitor Service Health from the Terminal Using profitmax-pro",
     "description": "Install and run structured health checks across your local services using profitmax-pro, a Python CLI with 7 built-in checks and LLM-powered improvement suggestions.",
     "step": [
-      {"@type": "HowToStep", "name": "Clone and install", "text": "git clone https://github.com/Coding-Dev-Tools/profitmax-pro.git && cd profitmax-pro && pip install ."},
+      {"@type": "HowToStep", "name": "Clone and install", "text": "git clone https://github.com/Coding-Dev-Tools.git && cd profitmax-pro && pip install ."},
       {"@type": "HowToStep", "name": "List registered checks", "text": "profitmax --task status"},
       {"@type": "HowToStep", "name": "Run all health checks", "text": "profitmax --task heartbeat"},
       {"@type": "HowToStep", "name": "Get LLM improvement suggestions", "text": "profitmax --task self-improve"}
@@ -167,7 +167,7 @@
 <main>
   <h1>Monitor Your Service Stack from the Terminal — <span class="highlight">Without a SaaS Subscription</span></h1>
   <p class="lede">Datadog is $15/host/month. New Relic has a free tier with a 100GB/month data cap. If you're running a small fleet of local or self-hosted services — a gateway, a dashboard, a background worker — you don't need either of those.</p>
-  <p class="updated">Last updated: June 2026 · <a href="https://github.com/Coding-Dev-Tools/profitmax-pro">profitmax-pro on GitHub</a></p>
+  <p class="updated">Last updated: June 2026 · <a href="https://github.com/Coding-Dev-Tools">profitmax-pro on GitHub</a></p>
 
   <div class="callout warn">
     <strong>Scope:</strong> profitmax-pro is a local health check CLI — not a hosted monitoring platform. It doesn't alert, doesn't store history, and doesn't run as a daemon. It's a structured way to ask "are my services up?" from the terminal.
@@ -179,7 +179,7 @@
 
   <h2>Install</h2>
   <p>profitmax-pro is <strong>not on public PyPI</strong>. Install from source (Python 3.11+ required):</p>
-<pre>git clone https://github.com/Coding-Dev-Tools/profitmax-pro.git
+<pre>git clone https://github.com/Coding-Dev-Tools.git
 cd profitmax-pro
 pip install .</pre>
   <p>Confirm it's working:</p>
@@ -298,7 +298,7 @@ def my_service_check():
   <div class="cta">
     <h2>Try profitmax-pro</h2>
     <p>MIT-licensed. No account, no API key required for heartbeat checks. Install from source in under a minute.</p>
-    <a class="btn" href="https://github.com/Coding-Dev-Tools/profitmax-pro">View on GitHub →</a>
+    <a class="btn" href="https://github.com/Coding-Dev-Tools">View on GitHub →</a>
   </div>
 </main>
 <footer>
