@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="canonical" href="https://coding-dev-tools.github.io/blog/json2sql-nested-json-to-relational-sql.html">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Convert nested JSON to relational SQL tables with json2sql | Coding Dev Tools</title>
 <meta name="description" content="Turn nested JSON — objects, arrays, and deeply composed structures — into normalized SQL INSERT statements. json2sql's --flatten mode auto-creates relational tables from nested data for PostgreSQL, MySQL, and SQLite. Free tier, no telemetry.">
+  <meta property="og:title" content="Convert nested JSON to relational SQL tables with json2sql | Coding Dev Tools">
+  <meta property="og:description" content="Turn nested JSON — objects, arrays, and deeply composed structures — into normalized SQL INSERT statements. json2sql's --flatten mode auto-creates relational tables from nested data for PostgreSQL, MySQL, and SQLite. Free tier, no telemetry.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://coding-dev-tools.github.io/blog/json2sql-nested-json-to-relational-sql.html">
 </head>
 <body>
 <h1>Convert nested JSON into relational SQL tables with json2sql</h1>
@@ -13,7 +18,7 @@
 <h2>Install</h2>
 <pre><code>pip install git+https://github.com/Coding-Dev-Tools/json2sql.git
 </code></pre>
-<p>json2sql is <strong>not</strong> published on public PyPI (publishing is pending), so a bare <code>pip install json2sql-cli</code> will fail — use the <code>git+</code> command above. It is MIT-licensed, requires only Python 3.10+, and runs fully offline on the free tier — no telemetry, no phone-home, no account required. Homebrew and Scoop are also available: <code>brew tap Coding-Dev-Tools/tap &amp;&amp; brew install json2sql-cli</code> or <code>scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket &amp;&amp; scoop install json2sql-cli</code>.</p>
+<p>json2sql is <strong>not</strong> published on public PyPI (publishing is pending), so a bare <code>pip install json2sql</code> will fail — use the <code>git+</code> command above. It is MIT-licensed, requires only Python 3.10+, and runs fully offline on the free tier — no telemetry, no phone-home, no account required. Homebrew and Scoop are also available: <code>brew tap Coding-Dev-Tools/tap &amp;&amp; brew install json2sql-cli</code> or <code>scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket &amp;&amp; scoop install json2sql-cli</code>.</p>
 
 <h2>Flatten a nested object into linked tables</h2>
 <p>Consider a user record where the address is an embedded object:</p>
