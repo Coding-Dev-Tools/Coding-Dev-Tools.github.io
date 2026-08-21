@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terraform cost estimation before apply: catch expensive plans early | Coding Dev Tools</title>
+<meta name="description" content="Estimate the monthly cost impact of a Terraform plan, CloudFormation changeset, or Pulumi preview before you deploy. DeployDiff reads provider-native cost metadata and shows a per-resource before/after delta plus a total monthly change.">
+</head>
+<body>
+<h1>Check what your infrastructure change costs — before you apply it</h1>
+<p>Most cloud bill surprises are born in a pull request. Someone adds an instance "just for staging", resizes a database, or duplicates a NAT gateway — and nobody notices until the invoice arrives. Terraform's own plan output tells you what will <em>change</em>, but not what it will <em>cost</em>.</p>
+<p><strong>DeployDiff</strong>'s <code>cost</code> command reads provider-native cost metadata straight out of the plan file and prints the damage as a number you can act on: per-resource before/after monthly cost, plus a summary row for the total monthly delta.</p>
+
+<h2>Install</h2>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/deploydiff.git
+</code></pre>
+<p>DeployDiff is not published on public PyPI (publishing is pending) — the <code>git+</code> command above is the documented pip path. Homebrew (<code>brew tap Coding-Dev-Tools/tap &amp;&amp; brew install deploydiff</code>) and Scoop (<code>scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket &amp;&amp; scoop install deploydiff</code>) are also available.</p>
+
+<h2>Run a cost estimate</h2>
+<pre><code># Terraform plan JSON
+deploydiff cost --tf plan.json
+
+# CloudFormation changeset
+deploydiff cost --cfn changeset.json
+
+# Supply custom pricing where the provider metadata is missing
+deploydiff cost --tf plan.json --pricing custom-pricing.json
+</code></pre>
+<p>The output lists each affected resource with its estimated cost before and after the change, then a total row showing the monthly difference. No separate billing API calls, no spreadsheet math — one command between <code>terraform plan</code> and <code>apply</code>.</p>
+
+<h2>Pricing data comes from the plan itself</h2>
+<p>DeployDiff reads provider-native pricing metadata embedded in Terraform and CloudFormation plan artifacts. For resources where the provider doesn't include cost data, pass a custom pricing file:</p>
+<pre><code>deploydiff cost --tf plan.json --pricing custom-pricing.json
+</code></pre>
+
+<h2>Gate expensive changes in CI</h2>
+<p>Combine <code>cost</code> with your pipeline's review step so a costly plan gets a human decision instead of an auto-apply:</p>
+<pre><code># Show the cost delta right in the CI log next to the diff
+deploydiff preview --tf plan.json
+deploydiff cost --tf plan.json
+
+# Fail loudly when the plan contains destructive changes
+deploydiff preview --tf plan.json | grep -q "destroy" &amp;&amp; echo "WARNING: Contains destructive changes!"
+</code></pre>
+
+<h2>Works across three IaC providers</h2>
+<p>The same CLI handles Terraform plan JSON, CloudFormation change sets, and Pulumi preview files — so mixed-provider teams don't need three cost-review workflows. DeployDiff also pairs every estimate with a human-readable diff (<a href="blog/deploydiff-preview-infra-changes.html">preview guide</a>) and generated rollback commands, so the full review loop — what changes, what it costs, how to undo — lives in one tool.</p>
+
+<h2>Pricing</h2>
+<p>The CLI is MIT-licensed, Python 3.10+, and runs fully offline with no telemetry. Cost impact estimation is part of the paid tiers (per the per-tier feature table): <strong>DeployDiff Individual $15/mo</strong> ($12 billed annually) unlocks unlimited stacks and multi-provider support; <strong>Suite $49/mo</strong> covers all 11 Coding Dev Tools CLI tools under one license; Team ($79/mo) adds shared reports and Slack alerts. The free tier includes the CLI with 1 plan comparison — enough to try the workflow end to end before upgrading.</p>
+
+<footer>
+  <p>Repo: <a href="https://github.com/Coding-Dev-Tools/deploydiff">github.com/Coding-Dev-Tools/deploydiff</a> &mdash; part of <a href="https://coding-dev-tools.github.io/devforge/">Coding Dev Tools</a></p>
+</footer>
+</body>
+</html>
