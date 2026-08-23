@@ -19,6 +19,7 @@ tools/linkcheck_portfolio.py.
 from __future__ import annotations
 
 import argparse
+import posixpath
 import re
 import sys
 from datetime import datetime, timezone
@@ -33,12 +34,17 @@ INDEX_SURFACES = [
 ]
 
 
-def normalize(href: str) -> str:
+def normalize(href: str, surface_dir: str) -> str:
+    """Resolve href against the surface page's own directory to a site-root path."""
     href = href.strip()
     if href.startswith(("http://", "https://")):
-        # keep only path portion when it points at our own site
         m = re.match(r"https?://[^/]+/(.+)$", href)
-        href = m.group(1) if m else ""
+        if not m:
+            return ""
+        href = m.group(1)
+    elif not href.startswith("/"):
+        # relative href: resolve against the linking page's directory
+        href = posixpath.normpath(posixpath.join(surface_dir, href))
     return href.lstrip("./")
 
 
@@ -59,8 +65,9 @@ def main() -> int:
             print(f"WARN: missing index surface {surface}", file=sys.stderr)
             continue
         html = f.read_text(encoding="utf-8", errors="replace")
+        surface_dir = posixpath.dirname(surface)
         for href in HREF_RE.findall(html):
-            target = normalize(href)
+            target = normalize(href, surface_dir)
             if target.startswith("blog/") and target.endswith(".html"):
                 linked.add(target.split("/", 1)[1])
 
