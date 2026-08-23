@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deterministic API tests with VCR record/replay — APIGhost</title>
+  <meta name="description" content="Record real API interactions once into a cassette, then replay them forever with identical responses. Flaky integration tests, fixed - with APIGhost's OpenAPI-driven mock server.">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/blog/apighost-vcr-record-replay-deterministic-api-tests.html">
+  <meta property="og:title" content="Deterministic API tests with VCR record/replay — APIGhost">
+  <meta property="og:description" content="Record real API interactions once into a cassette, then replay them forever with identical responses. Flaky integration tests, fixed.">
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Run deterministic API tests with recorded cassettes using APIGhost",
+    "step": [
+      {"@type": "HowToStep", "name": "Install the CLI", "text": "pip install git+https://github.com/Coding-Dev-Tools/apighost.git"},
+      {"@type": "HowToStep", "name": "Record a cassette", "text": "apighost record petstore.yaml makes sample requests against a generated mock server and saves the interactions to a named cassette."},
+      {"@type": "HowToStep", "name": "Replay deterministically", "text": "apighost replay my-recording -p 8080 serves the exact recorded responses for every test run."},
+      {"@type": "HowToStep", "name": "Inspect cassettes", "text": "apighost cassette list and apighost cassette info <name> show what was captured."}
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type": "Question", "name": "What is VCR-style record/replay for APIs?", "acceptedAnswer": {"@type": "Answer", "text": "You capture real HTTP request/response pairs once into a cassette file, then replay those exact responses in every later test run instead of re-deriving them live - making integration tests deterministic."}},
+      {"@type": "Question", "name": "Is APIGhost free?", "acceptedAnswer": {"@type": "Answer", "text": "The Free tier is $0 with unlimited local use and 100 requests per session. Per the pricing table, VCR cassettes and CI/CD integration are Pro tier features at $12/mo; the Suite is $49/mo."}}
+    ]
+  }
+  </script>
+</head>
+<body>
+  <h1>Flaky integration tests? Record the API once, <span class="highlight">replay it forever</span></h1>
+  <p class="lede">A test that passes at 9am and fails at 11am because a shared staging server hiccuped is worse than no test. VCR-style recording turns live API interactions into a cassette you can replay identically on every run - no network, no drift, no flakes.</p>
+  <p class="updated">Last updated: 2026-08-23 · <a href="https://github.com/Coding-Dev-Tools/apighost">APIGhost on GitHub</a></p>
+
+  <div class="callout warn">Honest scope: APIGhost reads an OpenAPI 3.0/3.1 spec and serves generated mocks or recorded cassettes locally. It does not proxy or transform production traffic, and it is not on public PyPI - install from source below.</div>
+
+  <div class="install-box">pip install git+https://github.com/Coding-Dev-Tools/apighost.git</div>
+  <p><em>Not on public PyPI; the self-hosted index is currently unavailable. The <code>git+</code> form above is the documented working pip path. Homebrew also works: <code>brew tap Coding-Dev-Tools/homebrew-tap &amp;&amp; brew install apighost</code>.</em></p>
+
+  <h2>Why mocks drift and tests flake</h2>
+  <p>Hand-written fixtures go stale the moment the API contract moves. Shared staging environments add latency, rate limits, and data that other people change under you. The result is the classic flake: same code, different answer.</p>
+  <p>The fix is to make the HTTP layer a constant. Record the request/response pairs once, commit the cassette to your repo, and replay it in CI and local runs. Your tests then exercise your code against byte-identical responses every time.</p>
+
+  <h2>Record once, replay forever</h2>
+  <pre><code># Capture interactions into a named cassette
+apighost record petstore.yaml
+
+# Replay the exact recorded responses
+apighost replay my-recording -p 8080</code></pre>
+  <ul>
+    <li><strong><code>record</code></strong> generates a mock server from the spec, fires sample requests at it (<code>--requests N</code>, default 5), and saves the interactions to a cassette file.</li>
+    <li><strong><code>replay</code></strong> serves those recorded pairs back verbatim on a local port - no spec parsing, no generation, just the captured behavior.</li>
+    <li><strong><code>cassette list</code></strong> / <strong><code>cassette info &lt;name&gt;</code></strong> show what was captured so reviews stay inspectable.</li>
+  </ul>
+
+  <h2>Fitting cassettes into CI</h2>
+  <pre><code>- name: Run integration tests against recorded cassette
+  run: |
+    apighost replay my-recording -p 8080 &amp;
+    sleep 2
+    pytest tests/integration/</code></pre>
+  <p>Because the replay server is local and offline, CI needs no secrets, no staging credentials, and no network access to third parties. When the OpenAPI contract changes, regenerate the mock from the spec, re-record, review the cassette diff alongside your code diff.</p>
+
+  <h2>Pricing</h2>
+  <table>
+    <tr><th>Tier</th><th>Price</th><th>Includes</th></tr>
+    <tr><td>Free</td><td>$0</td><td>Unlimited local use, 100 requests/session</td></tr>
+    <tr><td>Pro</td><td>$12/mo ($119/yr)</td><td>Unlimited requests, VCR cassettes, CI/CD integration</td></tr>
+    <tr><td>Suite</td><td>$49/mo ($39 billed annually)</td><td>All Coding-Dev-Tools tools under one license</td></tr>
+  </table>
+  <p>MIT-licensed source, Python 3.10+.</p>
+
+  <h3>Do cassettes replace mocking entirely?</h3>
+  <p>No - they complement it. Use <code>apighost serve</code> with scenarios when you need edge-case behaviors you have not observed yet; use record/replay when you want a frozen, deterministic copy of known-good behavior.</p>
+  <h3>Does replay need the original OpenAPI spec?</h3>
+  <p>No. <code>replay</code> takes only the cassette. The spec matters when generating or re-recording.</p>
+
+  <h2>Try it</h2>
+  <p>Clone or pip-install from source and point <code>record</code> at any OpenAPI spec you already have:</p>
+  <p><a class="button" href="https://github.com/Coding-Dev-Tools/apighost">APIGhost on GitHub</a></p>
+</body>
+</html>
