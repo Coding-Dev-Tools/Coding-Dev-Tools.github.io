@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://coding-dev-tools.github.io/sitemap.xml
