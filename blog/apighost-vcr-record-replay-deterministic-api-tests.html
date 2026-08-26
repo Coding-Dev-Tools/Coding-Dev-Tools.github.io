@@ -8,7 +8,25 @@
   <link rel="canonical" href="https://coding-dev-tools.github.io/blog/apighost-vcr-record-replay-deterministic-api-tests.html">
   <meta property="og:title" content="Deterministic API tests with VCR record/replay — APIGhost">
   <meta property="og:description" content="Record real API interactions once into a cassette, then replay them forever with identical responses. Flaky integration tests, fixed.">
-  <link rel="stylesheet" href="/style.css">
+  <style>
+    :root { --bg:#0d1117; --surface:#161b22; --border:#30363d; --text:#e6edf3; --muted:#8b949e; --accent-light:#818cf8; --green:#10b981; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; padding:56px 24px 80px; max-width:860px; margin:0 auto; }
+    a { color:var(--accent-light); }
+    h1 { font-size:36px; font-weight:800; line-height:1.15; margin-bottom:16px; }
+    h1 .highlight { color:var(--accent-light); }
+    .lede { font-size:19px; color:var(--muted); margin-bottom:12px; }
+    h2 { font-size:24px; font-weight:700; margin:44px 0 14px; }
+    h3 { font-size:18px; font-weight:600; margin:28px 0 8px; }
+    p { margin-bottom:16px; }
+    ul { margin:0 0 16px 22px; } li { margin-bottom:6px; }
+    .updated { font-size:13px; color:var(--muted); margin-bottom:28px; }
+    pre { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; overflow-x:auto; font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace; font-size:13.5px; line-height:1.5; margin:4px 0 20px; }
+    code { font-family:inherit; font-size:0.9em; background:var(--surface); padding:1px 5px; border-radius:4px; }
+    .install-box { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--green); border-radius:8px; padding:16px 20px; margin:32px 0 16px; }
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-top:3px solid var(--accent-light); border-radius:8px; padding:28px 32px; text-align:center; }
+    .button { display:inline-block; background:var(--accent-light); color:white; font-weight:700; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:15px; margin-top:12px; }
+  </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
