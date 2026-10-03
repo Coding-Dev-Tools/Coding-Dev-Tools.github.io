@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find &amp; remove unused CSS in React / Next.js projects | Coding Dev Tools</title>
+  <meta name="description" content="Find CSS module classes no component uses anymore and remove them safely. DeadCode scans React/Next.js repos for orphaned CSS, previews every deletion with --dry-run, and never leaves half-deleted styles.">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/blog/deadcode-find-unused-css-react.html">
+  <meta property="og:title" content="Find &amp; remove unused CSS in React / Next.js projects">
+  <meta property="og:description" content="Scan for orphaned CSS classes, preview every removal, and gate your CI on new dead styles.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"HowTo","name":"Find and remove unused CSS in a React or Next.js project","step":[{"@type":"HowToStep","name":"Install the CLI","text":"Install DeadCode from source with pip install git+https://github.com/Coding-Dev-Tools/deadcode.git"},{"@type":"HowToStep","name":"Scan for orphaned CSS","text":"Run deadcode scan -c orphaned_css to list CSS module classes defined but never referenced in TSX/JSX"},{"@type":"HowToStep","name":"Preview removals","text":"Run deadcode remove --dry-run -c orphaned_css to see exactly what would change before anything is written"},{"@type":"HowToStep","name":"Remove confirmed findings","text":"Run deadcode remove -c orphaned_css; only self-contained single-line findings are blanked and multi-line blocks are skipped with a warning"}]}</script>
+  <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is the free tier enough to find unused CSS?","acceptedAnswer":{"@type":"Answer","text":"Yes. Scanning including the orphaned_css category works on the free tier, which runs fully offline with no telemetry and is rate-limited."}},{"@type":"Question","name":"Can it break my stylesheets?","acceptedAnswer":{"@type":"Answer","text":"Removal always starts with a --dry-run preview, and the remover only blanks self-contained single-line findings; anything spanning multiple lines is skipped with a warning instead of being half-deleted."}},{"@type":"Question","name":"Is DeadCode on public PyPI?","acceptedAnswer":{"@type":"Answer","text":"No. PyPI publishing is pending. The documented install form is pip install git+https://github.com/Coding-Dev-Tools/deadcode.git."}}]}</script>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --green: #10b981;
+      --amber: #d29922;
+      --red: #f85149;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: var(--accent-light); }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: white;
+    }
+    .brand { font-size: 20px; font-weight: 700; text-decoration: none; color: var(--text); }
+    .brand span { color: var(--accent-light); }
+    main { max-width: 860px; margin: 0 auto; padding: 56px 24px 80px; }
+    h1 { font-size: 36px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    h1 .highlight { color: var(--accent-light); }
+    .lede { font-size: 19px; color: var(--muted); margin-bottom: 12px; }
+    h2 { font-size: 24px; font-weight: 700; margin: 44px 0 14px; }
+    h3 { font-size: 18px; font-weight: 600; margin: 28px 0 8px; }
+    p { margin-bottom: 16px; }
+    ul, ol { margin: 0 0 16px 22px; }
+    li { margin-bottom: 6px; }
+    .updated { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    .callout {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 8px 0 20px;
+    }
+    .callout strong { color: var(--text); }
+    .warn { border-left-color: var(--amber); }
+    .ok { border-left-color: var(--green); }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 8px; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--surface); font-weight: 600; }
+    .yes { color: var(--green); font-weight: 700; }
+    .no { color: var(--red); font-weight: 700; }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 13.5px;
+      line-height: 1.5;
+      margin: 4px 0 20px;
+    }
+    code { font-family: inherit; font-size: 0.9em; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+    .install-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 14px;
+      margin: 8px 0 16px;
+      overflow-x: auto;
+    }
+    .cta {
+      margin-top: 48px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .cta h2 { margin: 0 0 10px; font-size: 22px; }
+    .cta p { color: var(--muted); margin-bottom: 18px; }
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 15px;
+    }
+    .btn:hover { background: var(--accent-light); color: white; }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">C</div>
+  <a class="brand" href="/">Coding<span>Dev</span>Tools</a>
+</header>
+<main>
+  <h1>Find and remove <span class="highlight">unused CSS</span> in React &amp; Next.js</h1>
+  <p class="lede">Every design iteration leaves residue: <code>.oldCard</code> from a layout you replaced two sprints ago, utility classes from an experiment that never shipped, a whole <code>Button.module.css</code> whose component got rewritten inline. Nothing imports them, nothing renders them - but they still ship to your users and still confuse whoever reads the stylesheet next. DeadCode finds them mechanically, then removes them only after you have seen exactly what would change.</p>
+  <p class="updated">Last updated: 2026-08-22 &middot; <a href="https://github.com/Coding-Dev-Tools/deadcode">DeadCode on GitHub</a></p>
+
+  <div class="callout warn"><strong>Honest scope:</strong> DeadCode detects CSS classes defined in CSS modules but never referenced in TSX/JSX. It does not do full CSS cascade analysis or detect dynamically-composed class names - review findings before removing, and keep everything behind <code>--dry-run</code> until you trust the report.</div>
+
+  <h2>Install</h2>
+  <div class="install-box"># not on public PyPI - install from source (PyPI publishing pending)
+pip install git+https://github.com/Coding-Dev-Tools/deadcode.git
+
+# also available via Homebrew:
+brew tap Coding-Dev-Tools/tap && brew install deadcode</div>
+  <p style="color:var(--muted);font-size:13px;">DeadCode is MIT-licensed and dependency-free. A bare <code>pip install deadcode</code> will NOT get this tool - it is not on public PyPI yet.</p>
+
+  <h2>Why unused CSS keeps shipping</h2>
+<p>Tree-shaking handles JavaScript reasonably well, but stylesheet dead weight slips through most pipelines. CSS modules are imported wholesale - if one class in the file is used, the entire file ships. Over months of feature work, the gap between what your stylesheets define and what your components reference only grows, and no linter flags it because nothing is technically "broken."</p>
+<p>The fix is a mechanical audit: diff <em>what is defined</em> against <em>what is referenced</em>, across your whole repo at once.</p>
+
+<h2>Scan for orphaned CSS</h2>
+<pre>deadcode scan -c orphaned_css
+
+# quick overview of all four dead-code categories first, if you prefer:
+deadcode stats</pre>
+<p>DeadCode's <code>orphaned_css</code> category reports CSS classes that exist in your stylesheets but are never referenced by any TSX/JSX file - for example <code>.oldClass</code> sitting in <code>styles.module.css</code> with zero usages anywhere in the project. The scan covers export/import patterns, route detection, CSS class usage, and component references across the entire codebase, so one pass gives you the full picture rather than file-by-file guesswork.</p>
+
+<h2>Preview before you delete anything</h2>
+<p>This is the part worth trusting the tool for: removal is preview-first, and conservative by design.</p>
+<pre># show exactly what would change - writes nothing
+deadcode remove --dry-run
+
+# scope the preview (and the removal) to CSS only
+deadcode remove --dry-run -c orphaned_css</pre>
+<p>The remover only blanks self-contained single-line findings. Anything spanning multiple lines is skipped with a warning instead of being cut - so it never leaves half-deleted, broken code behind. When the dry-run looks right:</p>
+<pre>deadcode remove -c orphaned_css</pre>
+
+<h2>Gate CI on new dead styles</h2>
+<p>Cleanup without enforcement re-accumulates within a quarter. Add a threshold check to CI so a PR that introduces fresh orphaned CSS fails loudly instead of merging quietly:</p>
+<pre>deadcode scan -c orphaned_css --fail 5   # exit non-zero above 5 findings</pre>
+
+<h2>What free vs paid gets you</h2>
+<table>
+<tr><th></th><th>Free ($0)</th><th>Individual ($12/mo)</th></tr>
+<tr><td>Scan all 4 categories incl. orphaned CSS</td><td class="yes">Yes (rate-limited)</td><td class="yes">Yes, unlimited</td></tr>
+<tr><td>Works offline, no telemetry</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+<tr><td>Auto-removal with --dry-run preview</td><td class="no">No</td><td class="yes">Yes</td></tr>
+<tr><td>CI integration (--fail thresholds)</td><td class="no">No</td><td class="yes">Yes</td></tr>
+</table>
+<p>A $49/mo Suite license covers all eleven tools in the family if you want the same treatment for exports, routes, config drift, and infra plans too.</p>
+
+  <h3>Frequently asked questions</h3>
+<h3>Does scanning cost anything?</h3>
+<p>No. Scanning - including the <code>orphaned_css</code> category - works on the free tier, which runs fully offline with no telemetry; it is rate-limited. Unlimited scans, auto-removal, and CI gating are the Individual tier at $12/mo ($10/mo billed annually).</p>
+<h3>Can it break my styles?</h3>
+<p>Every removal starts with a <code>--dry-run</code> preview, and the remover blanks only self-contained single-line findings. Multi-line blocks are skipped with a warning, never partially deleted.</p>
+<h3>What about dynamically built class names like styles[prefix + name]?</h3>
+<p>Dynamically composed references can look unused to any static scan. That is why the workflow is preview-first: read the dry-run output, whitelist anything dynamic, and let the safe single-line remover handle the rest.</p>
+<h3>Is DeadCode on public PyPI?</h3>
+<p>Not yet - publishing is pending. The documented working install is <code>pip install git+https://github.com/Coding-Dev-Tools/deadcode.git</code>; Homebrew users can tap <code>Coding-Dev-Tools/tap</code>.</p>
+
+  <div class="cta">
+    <h2>See what your stylesheets forgot to delete</h2>
+    <p>One command shows every CSS class, export, route, and component your project stopped using - preview-first, offline, MIT-licensed.</p>
+    <a class="btn" href="https://github.com/Coding-Dev-Tools/deadcode">Try DeadCode free &rarr;</a>
+  </div>
+</main>
+<footer>
+  <p>Part of the <a href="https://github.com/Coding-Dev-Tools">Coding Dev Tools</a> suite · <a href="/">More guides</a> · Revenue Holdings · <a href="/blog/deadcode-find-unused-exports-typescript.html">Find unused TypeScript exports</a> &middot; <a href="/blog/configdrift-gate-deploys-on-config-drift-ci.html">Config-drift CI gates</a></p>
+</footer>
+</body>
+</html>
