@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test API error handling with response scenarios — APIGhost</title>
+  <meta name="description" content="Create named error scenarios (4xx/5xx responses) for your OpenAPI mock server and switch between them with one flag. Test how your client handles API failure modes - before production does it for you.">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/blog/apighost-scenario-error-handling-testing.html">
+  <meta property="og:title" content="Test API error handling with response scenarios — APIGhost">
+  <meta property="og:description" content="Named response presets for your OpenAPI mock server: define 500s, rate limits, and malformed payloads once, then serve them on demand.">
+  <style>
+    :root { --bg:#0d1117; --surface:#161b22; --border:#30363d; --text:#e6edf3; --muted:#8b949e; --accent-light:#818cf8; --green:#10b981; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; padding:56px 24px 80px; max-width:860px; margin:0 auto; }
+    a { color:var(--accent-light); }
+    h1 { font-size:36px; font-weight:800; line-height:1.15; margin-bottom:16px; }
+    h1 .highlight { color:var(--accent-light); }
+    .lede { font-size:19px; color:var(--muted); margin-bottom:12px; }
+    h2 { font-size:24px; font-weight:700; margin:44px 0 14px; }
+    h3 { font-size:18px; font-weight:600; margin:28px 0 8px; }
+    p { margin-bottom:16px; }
+    ul { margin:0 0 16px 22px; } li { margin-bottom:6px; }
+    .updated { font-size:13px; color:var(--muted); margin-bottom:28px; }
+    pre { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; overflow-x:auto; font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace; font-size:13.5px; line-height:1.5; margin:4px 0 20px; }
+    code { font-family:inherit; font-size:0.9em; background:var(--surface); padding:1px 5px; border-radius:4px; }
+    .install-box { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--green); border-radius:8px; padding:16px 20px; margin:32px 0 16px; }
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-top:3px solid var(--accent-light); border-radius:8px; padding:28px 32px; text-align:center; }
+    .button { display:inline-block; background:var(--accent-light); color:white; font-weight:700; padding:12px 28px; border-radius:8px; text-decoration:none; font-size:15px; margin-top:12px; }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Test client error handling with APIGhost response scenarios",
+    "step": [
+      {"@type": "HowToStep", "name": "Install the CLI", "text": "pip install git+https://github.com/Coding-Dev-Tools/apighost.git"},
+      {"@type": "HowToStep", "name": "Create a scenario", "text": "apighost scenario create error-test -d \"API error scenarios\" creates a named set of response overrides."},
+      {"@type": "HowToStep", "name": "Add an override", "text": "apighost scenario edit error-test \"GET /users\" --status 500 --body '{\"error\":\"oops\"}' makes that route fail on demand."},
+      {"@type": "HowToStep", "name": "Serve with the scenario active", "text": "apighost serve spec.yaml --scenario error-test starts the mock server with the override applied."},
+      {"@type": "HowToStep", "name": "Manage scenarios", "text": "apighost scenario list and apighost scenario delete error-test manage saved scenarios."}
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type": "Question", "name": "What is an API response scenario?", "acceptedAnswer": {"@type": "Answer", "text": "A named set of route overrides for a mock server - for example making GET /users return status 500 with a specific body - so you can exercise your client's error handling without staging a real outage."}},
+      {"@type": "Question", "name": "Is APIGhost free?", "acceptedAnswer": {"@type": "Answer", "text": "The Free tier is $0 with unlimited local use and 100 requests per session. The Pro tier at $12/mo adds unlimited requests, VCR cassettes, and CI/CD integration; the Suite is $49/mo."}}
+    ]
+  }
+  </script>
+</head>
+<body>
+  <h1>Your client will hit API errors in production. <span class="highlight">Rehearse them first</span></h1>
+  <p class="lede">Most teams test their happy path against a mock server and discover their error handling in production. APIGhost's scenario system lets you define named sets of failure responses - 500s, empty bodies, wrong shapes - and serve them from your OpenAPI spec with one flag.</p>
+  <p class="updated">Last updated: 2026-08-26 · <a href="https://github.com/Coding-Dev-Tools/apighost">APIGhost on GitHub</a></p>
+
+  <h2>The problem: error paths are untestable until it's too late</h2>
+  <p>What does your frontend do when <code>GET /users</code> returns a 500? What about a valid 200 with an unexpected shape? If those answers live in code review comments rather than tests, it's because spinning up a deliberately-broken API has always been more work than it's worth.</p>
+
+  <h2>Scenarios: named failure modes, zero config</h2>
+  <p>APIGhost reads your OpenAPI 3.0/3.1 spec and stands up a mock server. A <strong>scenario</strong> is a named set of route overrides layered on top:</p>
+
+  <pre><code># not on public PyPI - install from source or Homebrew
+pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+
+# 1. Create a named scenario
+apighost scenario create error-test -d "API error scenarios"
+
+# 2. Make GET /users fail with a 500 and a specific body
+apighost scenario edit error-test "GET /users" --status 500 --body '{"error":"oops"}'
+
+# 3. Start the mock server WITH the scenario active
+apighost serve petstore.yaml --scenario error-test
+
+# 4. Manage what you have
+apighost scenario list
+apighost scenario delete error-test</code></pre>
+
+  <p>Every request to <code>GET /users</code> now returns the overridden response, while every other route keeps serving realistic Faker-generated data from the spec. Flip back by dropping the flag - same command, happy path again.</p>
+
+  <h2>A practical regression suite</h2>
+  <ul>
+    <li><strong>outage</strong>: key routes return 503 so you can watch retry/backoff logic behave.</li>
+    <li><strong>rate-limited</strong>: a 429 on one endpoint exercises your client's throttle handling.</li>
+    <li><strong>malformed</strong>: a 200 with a truncated body proves your parser fails safely instead of crashing.</li>
+  </ul>
+  <p>Because scenarios are just JSON under <code>~/.apighost/scenarios/</code>, they commit cleanly alongside your tests.</p>
+
+  <h2>Pairs well with record/replay</h2>
+  <p>Scenarios cover deliberate failures; VCR-style recording covers deterministic success. Record real interactions once into a cassette and replay them forever - see our guide to <a href="/blog/apighost-vcr-record-replay-deterministic-api-tests.html">deterministic API tests with VCR record/replay</a>, or start with <a href="/blog/apighost-getting-started.html">getting started with APIGhost</a>.</p>
+
+  <div class="install-box">
+    <h3>Install</h3>
+    <pre><code>pip install git+https://github.com/Coding-Dev-Tools/apighost.git
+
+# or via Homebrew
+brew tap Coding-Dev-Tools/homebrew-tap
+brew install apighost</code></pre>
+    <p>APIGhost is not on public PyPI; the source install above is the documented pip path.</p>
+  </div>
+
+  <div class="cta-box">
+    <h3>Pricing</h3>
+    <p><strong>Free</strong>: $0 - unlimited local use, 100 requests per session.<br>
+    <strong>Pro</strong>: $12/mo ($119/yr) - unlimited requests, VCR cassettes, CI/CD integration.<br>
+    <strong>Suite</strong>: $49/mo ($39 billed annually) - all Coding-Dev-Tools tools under one license.</p>
+    <a class="button" href="https://github.com/Coding-Dev-Tools/apighost">Get APIGhost on GitHub →</a>
+  </div>
+</body>
+</html>

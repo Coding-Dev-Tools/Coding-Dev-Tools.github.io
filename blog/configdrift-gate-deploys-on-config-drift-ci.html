@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gate Deploys on Config Drift in CI — ConfigDrift Tutorial | Coding Dev Tools</title>
+<meta name="description" content="Add a config-drift CI gate with ConfigDrift: --output silent exits 1 on breaking drift so a deploy fails before a drifted config reaches production. Free CLI tier, offline, no telemetry.">
+<link rel="canonical" href="https://coding-dev-tools.github.io/blog/configdrift-gate-deploys-on-config-drift-ci.html">
+</head>
+<body>
+<main>
+<h1>Gate your deploys on config drift — fail the build before prod finds out</h1>
+<p class="lede">Staging and production configs drift quietly: one incident fix touches prod only, three weeks later a routine deploy behaves differently per environment. A one-line CI step makes that a build failure instead of a 2&nbsp;a.m. page.</p>
+
+<h2>The gate: <code>--output silent</code></h2>
+<p>ConfigDrift is an MIT-licensed Python 3.10+ CLI that compares config files or whole environment directories and classifies drift by severity. For CI, use silent output: the command exits <code>0</code> when there is no breaking drift and <code>1</code> when breaking drift is found.</p>
+<pre><code>pip install git+https://github.com/Coding-Dev-Tools/configdrift.git
+
+configdrift check ./config/staging/app.yaml ./config/prod/app.yaml --output silent
+# exit 0 = no breaking drift · exit 1 = breaking drift → CI fails
+</code></pre>
+<p>By default only <em>breaking</em> drift fails the gate. Keys like <code>database*</code>, <code>auth*</code>, <code>api_key*</code>, <code>secret*</code>, <code>password*</code>, <code>token*</code>, and <code>endpoint*</code> are classified breaking out of the box. Add <code>--strict</code> if you want <em>any</em> drift — not just breaking changes — to fail the build.</p>
+
+<h2>GitHub Actions example</h2>
+<pre><code>- name: Detect config drift
+  run: |
+    pip install git+https://github.com/Coding-Dev-Tools/configdrift.git
+    configdrift check ./config/staging/app.yaml ./config/prod/app.yaml --output silent
+</code></pre>
+<p>For monorepos with several services, compare whole directories at once:</p>
+<pre><code>configdrift scan ./config/staging ./config/prod --baseline staging --output silent
+</code></pre>
+
+<h2>Tuning the gate</h2>
+<ul>
+<li><strong>Severity rules</strong>: review which keys count as breaking in your project settings; the defaults match where most teams get paged.</li>
+<li><strong>Baselines</strong>: pass <code>--baseline</code>/<code>--target</code> to make direction explicit when comparing environments.</li>
+<li><strong>Noise control</strong>: large scans are slower — narrow the scan to changed files or a single directory.</li>
+</ul>
+
+<h2>What it costs</h2>
+<p>The CLI (<code>check</code>, <code>scan</code>) is free forever: works fully offline, no telemetry, no phone-home. If you outgrow one environment pair, paid tiers add unlimited environments ($15/mo Individual) or the full suite of 11 developer tools ($49/mo Suite).</p>
+<table>
+<tr><th>Tier</th><th>Price</th><th>Includes</th></tr>
+<tr><td>Free</td><td>$0</td><td>CLI only, 1 env pair</td></tr>
+<tr><td>Individual</td><td>$15/mo ($12 annual)</td><td>Unlimited environments, custom rules</td></tr>
+<tr><td>Suite</td><td>$49/mo ($39 annual)</td><td>All 11 tools</td></tr>
+</table>
+
+<h2>Install</h2>
+<pre><code># not published on public PyPI — install from source:
+pip install git+https://github.com/Coding-Dev-Tools/configdrift.git
+# macOS/Linux via Homebrew:
+brew tap Coding-Dev-Tools/tap &amp;&amp; brew install configdrift
+# Windows via Scoop:
+scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
+scoop install configdrift
+</code></pre>
+
+<p>Repo: <a href="https://github.com/Coding-Dev-Tools/configdrift">github.com/Coding-Dev-Tools/configdrift</a> · Related guide: <a href="https://coding-dev-tools.github.io/blog/configdrift-detect-config-drift-across-environments.html">Detecting config drift across environments</a></p>
+</main>
+</body>
+</html>

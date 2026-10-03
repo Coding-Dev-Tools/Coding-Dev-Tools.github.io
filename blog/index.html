@@ -133,6 +133,57 @@
     <p>See what changes, estimate cost impact, and generate rollback commands — all from one CLI. Terraform, CloudFormation, and Pulumi supported.</p>
     <span class="tag">DeployDiff</span>
   </a>
+  <a class="post" href="/blog/deploydiff-cost-estimation-before-apply.html">
+    <h2>Terraform cost estimation before apply</h2>
+    <p>Estimate the monthly cost impact of a plan before you deploy — per-resource before/after deltas and a total monthly change, from Terraform, CloudFormation, or Pulumi plan files.</p>
+    <span class="tag">DeployDiff</span>
+  </a>
+  <a class="post" href="/blog/configdrift-gate-deploys-on-config-drift-ci.html">
+    <h2>Gate deploys on config drift in CI</h2>
+    <p>Fail the build when environments diverge: <code>--output silent</code> exits 1 on breaking drift, so a deploy stops before a drifted config reaches production. Free CLI tier, offline, no telemetry.</p>
+    <span class="tag">ConfigDrift</span>
+  </a>
+  <a class="post" href="/blog/configdrift-detect-config-drift-across-environments.html">
+    <h2>Detect configuration drift across environments</h2>
+    <p>ConfigDrift diffs YAML, JSON, TOML, and .env files across dev, staging, and production and classifies every difference by severity - with CI gating and compliance reporting.</p>
+    <span class="tag">ConfigDrift</span>
+  </a>
+  <a class="post" href="/blog/datamorph-convert-csv-to-parquet.html">
+    <h2>Convert CSV to Parquet from the command line</h2>
+    <p>A streaming converter that turns CSV into Parquet (and JSON, YAML, Avro) without loading files into memory - schema inference, batch mode, CI-friendly validation.</p>
+    <span class="tag">DataMorph</span>
+  </a>
+  <a class="post" href="/blog/envault-scan-prevent-env-leaks-in-git.html">
+    <h2>Audit .env files for weak secrets before they reach git</h2>
+    <p>rh-envault scan flags weak secrets, wrong permissions, and missing .gitignore entries - and a pre-commit hook blocks bad commits.</p>
+    <span class="tag">Envault</span>
+  </a>
+  <a class="post" href="/blog/json2sql-nested-json-to-relational-sql.html">
+    <h2>Flatten nested JSON into relational SQL tables</h2>
+    <p>--flatten splits nested objects and arrays into separate relational tables of INSERT statements for PostgreSQL, MySQL, and SQLite.</p>
+    <span class="tag">json2sql</span>
+  </a>
+  <a class="post" href="/blog/deadcode-find-unused-css-react.html">
+    <h2>Find &amp; remove unused CSS in React / Next.js projects</h2>
+    <p>DeadCode scans your repo for orphaned CSS module classes no component uses anymore, previews every deletion with <code>--dry-run</code>, and never leaves half-deleted styles behind.</p>
+    <span class="tag">DeadCode</span>
+  </a>
+  <a class="post" href="/blog/json2sql-json-array-to-sql-insert-rows.html">
+    <h2>Turn a JSON array into SQL INSERT rows</h2>
+    <p>One INSERT row per array element, types inferred, PostgreSQL/MySQL/SQLite dialects - plus stdin piping for CI pipelines. Free CLI tier, offline, no telemetry.</p>
+    <span class="tag">json2sql</span>
+  </a>
+  <a class="post" href="/blog/apighost-vcr-record-replay-deterministic-api-tests.html">
+    <h2>Deterministic API tests with VCR record/replay</h2>
+    <p>Record real API interactions once into a cassette and replay them forever with identical responses - no staging server, no network, no flakes. OpenAPI-driven mock server by APIGhost.</p>
+    <span class="tag">APIGhost</span>
+  </a>
+  <a class="post" href="/blog/apighost-scenario-error-handling-testing.html">
+    <h2>Test API error handling with response scenarios</h2>
+    <p>Named response presets for your OpenAPI mock server: make GET /users return a 500 on demand, serve it with one flag, and prove your client fails safely. By APIGhost.</p>
+    <span class="tag">APIGhost</span>
+  </a>
 </div>
 </body>
 </html>
+<!DOCTYPE html>

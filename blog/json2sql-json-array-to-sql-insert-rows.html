@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSON Array to SQL INSERT Statements in One Command | Coding Dev Tools</title>
+  <meta name="description" content="Convert a JSON array of objects into SQL INSERT rows with json2sql - typed values, PostgreSQL/MySQL/SQLite dialects, stdin pipe support. Free CLI tier, fully offline.">
+  <link rel="canonical" href="https://coding-dev-tools.github.io/blog/json2sql-json-array-to-sql-insert-rows.html">
+  <meta property="og:title" content="JSON array &rarr; SQL INSERT rows in one command">
+  <meta property="og:description" content="json2sql turns an array of JSON objects into typed INSERT statements for PostgreSQL, MySQL, or SQLite. Free offline CLI tier.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Turn a JSON array into SQL INSERT statements with json2sql",
+  "description": "Convert a JSON array of objects into typed SQL INSERT rows for PostgreSQL, MySQL, or SQLite using the json2sql CLI.",
+  "totalTime": "PT2M",
+  "tool": "json2sql CLI",
+  "step": [
+    {"@type": "HowToStep", "name": "Install json2sql", "text": "pip install git+https://github.com/Coding-Dev-Tools/json2sql.git (not on public PyPI), or brew install json2sql-cli after tapping Coding-Dev-Tools/tap.", "url": "https://coding-dev-tools.github.io/blog/json2sql-json-array-to-sql-insert-rows.html#install"},
+    {"@type": "HowToStep", "name": "Convert the array", "text": "Run json2sql convert users.json --table users. Each element of the JSON array becomes its own INSERT row with types inferred.", "url": "https://coding-dev-tools.github.io/blog/json2sql-json-array-to-sql-insert-rows.html#convert"},
+    {"@type": "HowToStep", "name": "Choose a dialect and output file", "text": "Add --dialect postgres, mysql, or sqlite, and -o seed.sql to write a seed file instead of stdout.", "url": "https://coding-dev-tools.github.io/blog/json2sql-json-array-to-sql-insert-rows.html#dialect"},
+    {"@type": "HowToStep", "name": "Load the SQL", "text": "Run the generated statements against your database, e.g. sqlite3 test.db < seed.sql, or pipe JSON straight through stdin in a CI pipeline.", "url": "https://coding-dev-tools.github.io/blog/json2sql-json-array-to-sql-insert-rows.html#load"}
+  ]
+}
+</script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Is json2sql on public PyPI?", "acceptedAnswer": {"@type": "Answer", "text": "No. Verified working installs: pip install git+https://github.com/Coding-Dev-Tools/json2sql.git, Homebrew (brew install json2sql-cli via Coding-Dev-Tools/tap), and Scoop (scoop install json2sql-cli)."}},
+    {"@type": "Question", "name": "Does each array element become its own INSERT row?", "acceptedAnswer": {"@type": "Answer", "text": "Yes - a JSON array of objects is converted into multiple INSERT rows, with string, number, boolean, and null values typed automatically."}},
+    {"@type": "Question", "name": "Which SQL dialects are supported?", "acceptedAnswer": {"@type": "Answer", "text": "PostgreSQL, MySQL, and SQLite INSERT syntax, selected with the --dialect option."}},
+    {"@type": "Question", "name": "What about nested objects?", "acceptedAnswer": {"@type": "Answer", "text": "Use --flatten: nested objects are split into separate relational tables instead of being flattened into opaque columns."}},
+    {"@type": "Question", "name": "What does the free tier include?", "acceptedAnswer": {"@type": "Answer", "text": "The full CLI (convert and pipe across all three dialects) with limited rows per conversion, fully offline with no telemetry. The $9/mo Individual tier lifts the row limit and adds batch processing and schema generation."}}
+  ]
+}
+</script>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --green: #10b981;
+      --amber: #d29922;
+      --red: #f85149;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: var(--accent-light); }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: white;
+    }
+    .brand { font-size: 20px; font-weight: 700; text-decoration: none; color: var(--text); }
+    .brand span { color: var(--accent-light); }
+    main { max-width: 860px; margin: 0 auto; padding: 56px 24px 80px; }
+    h1 { font-size: 36px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    h1 .highlight { color: var(--accent-light); }
+    .lede { font-size: 19px; color: var(--muted); margin-bottom: 12px; }
+    h2 { font-size: 24px; font-weight: 700; margin: 44px 0 14px; }
+    h3 { font-size: 18px; font-weight: 600; margin: 28px 0 8px; }
+    p { margin-bottom: 16px; }
+    ul, ol { margin: 0 0 16px 22px; }
+    li { margin-bottom: 6px; }
+    .updated { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    .callout {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 8px 0 20px;
+    }
+    .callout strong { color: var(--text); }
+    .warn { border-left-color: var(--amber); }
+    .ok { border-left-color: var(--green); }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 8px; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--surface); font-weight: 600; }
+    .yes { color: var(--green); font-weight: 700; }
+    .no { color: var(--red); font-weight: 700; }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 13.5px;
+      line-height: 1.5;
+      margin: 4px 0 20px;
+    }
+    code { font-family: inherit; font-size: 0.9em; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+    .install-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 14px;
+      margin: 8px 0 16px;
+      overflow-x: auto;
+    }
+    .cta {
+      margin-top: 48px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .cta h2 { margin: 0 0 10px; font-size: 22px; }
+    .cta p { color: var(--muted); margin-bottom: 18px; }
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 15px;
+    }
+    .btn:hover { background: var(--accent-light); color: white; }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">C</div>
+  <a class="brand" href="/">Coding<span>Dev</span>Tools</a>
+</header>
+<main>
+  <h1>Turn a <span class="highlight">JSON array</span> into SQL INSERT rows</h1>
+  <p class="lede">Every export you get from an API, a NoSQL store, or an analytics tool arrives as the same shape: an array of objects in a <code>.json</code> file. Your database, meanwhile, wants INSERT statements. json2sql reads that array and emits one INSERT row per element - strings, numbers, booleans, and nulls typed automatically - in PostgreSQL, MySQL, or SQLite dialect. No throwaway conversion script required.</p>
+  <p class="updated">Last updated: 2026-08-23 &middot; <a href="https://github.com/Coding-Dev-Tools/json2sql">json2sql on GitHub</a></p>
+
+  <div class="callout warn"><strong>Honest scope:</strong> json2sql is a one-way converter: JSON in, a file of INSERT statements out. It does not connect to your database or execute anything - you load the generated SQL yourself or pipe it through your usual migration step. Nested objects are supported via <code>--flatten</code>, which splits them into separate relational tables.</div>
+
+  <h2>Install</h2>
+  <div class="install-box"># not on public PyPI - install from source
+pip install git+https://github.com/Coding-Dev-Tools/json2sql.git
+
+# also available via Homebrew (macOS/Linux):
+brew tap Coding-Dev-Tools/tap &amp;&amp; brew install json2sql-cli
+
+# or Scoop (Windows):
+scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
+scoop install json2sql-cli</div>
+  <p style="color:var(--muted);font-size:13px;">A bare <code>pip install json2sql</code> will NOT get this tool - it is not on public PyPI, and the suite's self-hosted package index is currently offline. The <code>git+</code> command and the Homebrew/Scoop packages above are the verified working installs (package links checked 2026-08-23).</p>
+
+  <h2>From array-of-objects to INSERT rows</h2>
+<p>The feature that matters for seed files and data migrations is the boring one: json2sql handles a JSON <em>array of objects</em> as multiple INSERT rows - one statement per element, with each value's type (string, number, boolean, null) inferred automatically. Point it at your table name so the generated SQL is valid the moment it lands:</p>
+<pre>json2sql convert users.json --table users
+
+# pick the dialect that matches your target database:
+json2sql convert users.json --dialect postgres
+json2sql convert users.json --dialect mysql
+json2sql convert users.json --dialect sqlite
+
+# write straight to a seed file instead of stdout:
+json2sql convert fixtures.json --dialect sqlite -o seed.sql</pre>
+
+<h2>Pipe it into your pipeline</h2>
+<p>Because the CLI reads stdin too, conversion drops into a shell pipeline without a temp file - useful when the JSON comes from curl, jq, or another build step:</p>
+<pre>cat data.json | json2sql convert --dialect postgres --table events &gt; events.sql</pre>
+<p>And for test fixtures in CI, generate a seed file and load it into a scratch SQLite database:</p>
+<pre>json2sql convert fixtures.json --dialect sqlite -o seed.sql
+sqlite3 test.db &lt; seed.sql</pre>
+
+<h2>Nested objects? Flatten them into real tables</h2>
+<p>Real exports are rarely flat. With <code>--flatten</code>, json2sql splits nested objects into separate relational tables instead of mangling them into stringified blobs. The full walkthrough - including how the split tables come back together - is in the companion guide, <a href="/blog/json2sql-nested-json-to-relational-sql.html">nested JSON to relational SQL</a>.</p>
+
+<h2>What free vs paid gets you</h2>
+<table>
+<tr><th></th><th>Free ($0)</th><th>Individual ($9/mo)</th></tr>
+<tr><td>Convert + pipe CLI (all three dialects)</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+<tr><td>Rows per conversion</td><td class="no">Limited</td><td class="yes">Unlimited</td></tr>
+<tr><td>Batch processing</td><td class="no">No</td><td class="yes">Yes</td></tr>
+<tr><td>Schema generation</td><td class="no">No</td><td class="yes">Yes</td></tr>
+<tr><td>Works offline, no telemetry</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+</table>
+<p>Individual is $9/mo ($7/mo billed annually). A $49/mo Suite license covers all eleven tools in the family - schema migration, config drift, env security, infra plans, dead code, and more.</p>
+
+  <h3>Frequently asked questions</h3>
+<h3>Is json2sql on public PyPI?</h3>
+<p>No. The verified working installs are <code>pip install git+https://github.com/Coding-Dev-Tools/json2sql.git</code>, Homebrew (<code>brew install json2sql-cli</code> after tapping <code>Coding-Dev-Tools/tap</code>), and Scoop (<code>scoop install json2sql-cli</code>).</p>
+<h3>Does each array element become its own INSERT row?</h3>
+<p>Yes - a JSON array of objects is handled as multiple INSERT rows, with types inferred per value (strings, numbers, booleans, nulls).</p>
+<h3>Which SQL dialects are supported?</h3>
+<p>PostgreSQL, MySQL, and SQLite INSERT syntax, selected with <code>--dialect</code>.</p>
+<h3>What about nested objects?</h3>
+<p>Use <code>--flatten</code>: nested objects are split into separate relational tables rather than being flattened into opaque columns.</p>
+<h3>What does the free tier include?</h3>
+<p>The full CLI: convert and pipe across all three dialects, with limited rows per conversion. It works fully offline with no telemetry. Individual ($9/mo) lifts the row limit and adds batch processing plus schema generation.</p>
+
+  <div class="cta">
+    <h2>Convert your next JSON export in one command</h2>
+    <p>json2sql turns arrays of objects into typed INSERT statements for PostgreSQL, MySQL, and SQLite - free CLI tier, fully offline, no telemetry.</p>
+    <a class="btn" href="https://github.com/Coding-Dev-Tools/json2sql">Try json2sql free &rarr;</a>
+  </div>
+</main>
+<footer>
+  <p>Part of the <a href="https://github.com/Coding-Dev-Tools">Coding Dev Tools</a> suite · <a href="/">More guides</a> · Revenue Holdings · <a href="/blog/json2sql-nested-json-to-relational-sql.html">Nested JSON to relational SQL</a> &middot; <a href="/blog/configdrift-gate-deploys-on-config-drift-ci.html">Config-drift CI gates</a></p>
+</footer>
+</body>
+</html>
